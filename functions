@@ -140,7 +140,6 @@ service_start() {
 
 service_url() {
   local SERVICE="$1"
-  local SERVICE_ROOT="$PLUGIN_DATA_ROOT/$SERVICE"
   local SERVICE_DNS_HOSTNAME="$(service_dns_hostname "$SERVICE")"
   local DATABASE_NAME="$(get_database_name "$SERVICE")"
   local PASSWORD="$(service_password "$SERVICE")"
