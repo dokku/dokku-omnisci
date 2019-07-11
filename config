@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-export OMNISCI_IMAGE=${OMNISCI_IMAGE:="omnisci"}
+export OMNISCI_IMAGE=${OMNISCI_IMAGE:="omnisci/core-os-cpu"}
 export OMNISCI_IMAGE_VERSION=${OMNISCI_IMAGE_VERSION:="v4.7.1"}
 export OMNISCI_ROOT=${OMNISCI_ROOT:="$DOKKU_LIB_ROOT/services/omnisci"}
 export OMNISCI_HOST_ROOT=${OMNISCI_HOST_ROOT:=$OMNISCI_ROOT}
