@@ -22,21 +22,21 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:info) success" {
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "${lines[*]}" "omnisci://omnisci:$password@dokku-omnisci-l:3306/l"
+  assert_contains "${lines[*]}" "http://l:$password@dokku-couchdb-l:5984/l"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) replaces underscores by dash in hostname" {
   dokku "$PLUGIN_COMMAND_PREFIX:create" test_with_underscores
   run dokku "$PLUGIN_COMMAND_PREFIX:info" test_with_underscores
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/test_with_underscores/PASSWORD")"
-  assert_contains "${lines[*]}" "omnisci://omnisci:$password@dokku-omnisci-test-with-underscores:3306/test_with_underscores"
+  assert_contains "${lines[*]}" "http://test_with_underscores:$password@dokku-couchdb-test-with-underscores:5984/test_with_underscores"
   dokku --force "$PLUGIN_COMMAND_PREFIX:destroy" test_with_underscores
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) success with flag" {
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --dsn
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_output "omnisci://omnisci:$password@dokku-omnisci-l:3306/l"
+  assert_output "http://l:$password@dokku-couchdb-l:5984/l"
 
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --config-dir
   assert_success
@@ -57,6 +57,9 @@ teardown() {
   assert_success
 
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --links
+  assert_success
+
+  run dokku "$PLUGIN_COMMAND_PREFIX:info" l --service-root
   assert_success
 
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --service-root

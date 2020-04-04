@@ -3,12 +3,12 @@ load test_helper
 
 setup() {
   dokku "$PLUGIN_COMMAND_PREFIX:create" l
-  echo "CREATE DATABASE IF NOT EXISTS l;" | tee "/tmp/fake.sql"
+  echo '{"new_edits":false,"docs":[]}' | tee "/tmp/fake.json"
 }
 
 teardown() {
   dokku --force "$PLUGIN_COMMAND_PREFIX:destroy" l
-  rm -f "/tmp/fake.sql"
+  rm -f "/tmp/fake.json"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:import) error when there are no arguments" {
@@ -30,7 +30,7 @@ teardown() {
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:import) success" {
-  run dokku "$PLUGIN_COMMAND_PREFIX:import" l < "/tmp/fake.sql"
+  run dokku "$PLUGIN_COMMAND_PREFIX:import" l < "/tmp/fake.json"
   echo "output: $output"
   echo "status: $status"
   assert_success

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/config"
 set -eo pipefail
 [[ $DOKKU_TRACE ]] && set -x
 source "$PLUGIN_AVAILABLE_PATH/config/functions"
@@ -217,7 +218,7 @@ service_backup() {
   fi
 
   # shellcheck disable=SC2086
-  docker run --rm $BACKUP_PARAMETERS dokku/s3backup:0.10.0
+  docker run --rm $BACKUP_PARAMETERS "$PLUGIN_S3BACKUP_IMAGE"
 }
 
 service_backup_auth() {
@@ -394,7 +395,7 @@ service_info() {
     "--version: $(service_version "$SERVICE")"
   )
   if [[ -z "$INFO_FLAG" ]]; then
-    dokku_log_info2 "Container Information"
+    dokku_log_info2 "$SERVICE $PLUGIN_COMMAND_PREFIX service information"
     for flag in "${flag_map[@]}"; do
       key="$(echo "${flag#--}" | cut -f1 -d' ' | tr - ' ')"
       dokku_log_verbose "$(printf "%-20s %-25s" "${key^}" "${flag#*: }")"
@@ -494,19 +495,16 @@ service_links() {
 service_list() {
   declare desc="Lists all services and their status"
   local SERVICES=$(ls "$PLUGIN_DATA_ROOT" 2>/dev/null)
+
   if [[ -z $SERVICES ]]; then
     dokku_log_warn "There are no $PLUGIN_SERVICE services"
-  else
-    LIST=""
-    if [[ -z "$DOKKU_QUIET_OUTPUT" ]]; then
-      LIST="NAME,VERSION,STATUS,EXPOSED PORTS,LINKS\n"
-    fi
-
-    for SERVICE in $SERVICES; do
-      LIST+="$SERVICE,$(service_version "$SERVICE"),$(service_status "$SERVICE"),$(service_exposed_ports "$SERVICE"),$(service_linked_apps "$SERVICE")\n"
-    done
-    printf "%b" "$LIST" | column -t -s,
+    return
   fi
+
+  dokku_log_info2_quiet "$PLUGIN_SERVICE services"
+  for SERVICE in $SERVICES; do
+    echo "$SERVICE"
+  done
 }
 
 service_logs() {
@@ -689,7 +687,7 @@ service_port_unpause() {
   echo "${PORTS[@]}" >"$PORT_FILE"
 
   # shellcheck disable=SC2046
-  docker run -d --link "$SERVICE_NAME:$PLUGIN_COMMAND_PREFIX" --name "$EXPOSED_NAME" $(docker_ports_options "${PORTS[@]}") --restart always --label dokku=ambassador --label "dokku.ambassador=$PLUGIN_COMMAND_PREFIX" dokku/ambassador:0.3.0 >/dev/null
+  docker run -d --link "$SERVICE_NAME:$PLUGIN_COMMAND_PREFIX" --name "$EXPOSED_NAME" $(docker_ports_options "${PORTS[@]}") --restart always --label dokku=ambassador --label "dokku.ambassador=$PLUGIN_COMMAND_PREFIX" "$PLUGIN_AMBASSADOR_IMAGE" >/dev/null
   if [[ "$LOG_FAIL" == "true" ]]; then
     dokku_log_info1 "Service $SERVICE exposed on port(s) [container->host]: $(service_exposed_ports "$SERVICE")"
   fi
@@ -740,13 +738,7 @@ service_status() {
   local ID="$(cat "$SERVICE_ROOT/ID")"
   local CONTAINER_STATUS
 
-  is_container_status "$ID" "Dead" && echo "dead" && return 0
-  is_container_status "$ID" "OOMKilled" && echo "oomkilled" && return 0
-  is_container_status "$ID" "Paused" && echo "paused" && return 0
-  is_container_status "$ID" "Restarting" && echo "restarting" && return 0
-  is_container_status "$ID" "Running" && echo "running" && return 0
-
-  CONTAINER_STATUS=$(docker inspect -f "{{.State.Status}}" "$CID" 2>/dev/null || true)
+  CONTAINER_STATUS=$(docker inspect -f "{{.State.Status}}" "$ID" 2>/dev/null || true)
   [[ -n "$CONTAINER_STATUS" ]] && echo "$CONTAINER_STATUS" && return 0
   echo "missing" && return 0
 }
