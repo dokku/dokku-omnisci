@@ -1,6 +1,6 @@
 # dokku omnisci [![Build Status](https://img.shields.io/travis/dokku/dokku-omnisci.svg?branch=master "Build Status")](https://travis-ci.org/dokku/dokku-omnisci) [![IRC Network](https://img.shields.io/badge/irc-freenode-blue.svg "IRC Freenode")](https://webchat.freenode.net/?channels=dokku)
 
-Official omnisci plugin for dokku. Currently defaults to installing [omnisci v4.7.1](https://hub.docker.com/_/omnisci/).
+Official omnisci plugin for dokku. Currently defaults to installing [omnisci v5.1.2](https://hub.docker.com/_/omnisci/).
 
 ## Requirements
 
