@@ -10,7 +10,6 @@ jobs:
       - checkout
       - run: make setup
       - run: sudo sysctl -w vm.max_map_count=262144
-      - run: make build-docker-image
       - run:
           command: |
             make generate;
@@ -38,7 +37,6 @@ jobs:
       - checkout
       - run: make setup
       - run: sudo sysctl -w vm.max_map_count=262144
-      - run: make build-docker-image
       - run:
           command: |
             make generate;
