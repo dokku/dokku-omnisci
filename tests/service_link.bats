@@ -50,33 +50,33 @@ teardown() {
   run dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   echo "output: $output"
   echo "status: $status"
-  assert_contains "${lines[*]}" "Already linked as COUCHDB_URL"
+  assert_contains "${lines[*]}" "Already linked as OMNISCI_URL"
   assert_failure
 
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) exports COUCHDB_URL to app" {
+@test "($PLUGIN_COMMAND_PREFIX:link) exports OMNISCI_URL to app" {
   run dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   echo "output: $output"
   echo "status: $status"
-  url=$(dokku config:get my_app COUCHDB_URL)
+  url=$(dokku config:get my_app OMNISCI_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "http://l:$password@dokku-couchdb-l:5984/l"
+  assert_contains "$url" "http://l:$password@dokku-omnisci-l:5984/l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when COUCHDB_URL already in use" {
-  dokku config:set my_app COUCHDB_URL=http://user:pass@host:5984/db
+@test "($PLUGIN_COMMAND_PREFIX:link) generates an alternate config url when OMNISCI_URL already in use" {
+  dokku config:set my_app OMNISCI_URL=http://user:pass@host:5984/db
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   run dokku config my_app
-  assert_contains "${lines[*]}" "DOKKU_COUCHDB_AQUA_URL"
+  assert_contains "${lines[*]}" "DOKKU_OMNISCI_AQUA_URL"
   assert_success
 
   dokku "$PLUGIN_COMMAND_PREFIX:link" m my_app
   run dokku config my_app
-  assert_contains "${lines[*]}" "DOKKU_COUCHDB_BLACK_URL"
+  assert_contains "${lines[*]}" "DOKKU_OMNISCI_BLACK_URL"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" m my_app
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
@@ -85,24 +85,24 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:link) links to app with docker-options" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
   run dokku docker-options:report my_app
-  assert_contains "${lines[*]}" "--link dokku.couchdb.l:dokku-couchdb-l"
+  assert_contains "${lines[*]}" "--link dokku.omnisci.l:dokku-omnisci-l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
 
-@test "($PLUGIN_COMMAND_PREFIX:link) uses apps COUCHDB_DATABASE_SCHEME variable" {
-  dokku config:set my_app COUCHDB_DATABASE_SCHEME=couchdb2
+@test "($PLUGIN_COMMAND_PREFIX:link) uses apps OMNISCI_DATABASE_SCHEME variable" {
+  dokku config:set my_app OMNISCI_DATABASE_SCHEME=omnisci2
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app
-  url=$(dokku config:get my_app COUCHDB_URL)
+  url=$(dokku config:get my_app OMNISCI_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "couchdb2://l:$password@dokku-couchdb-l:5984/l"
+  assert_contains "$url" "omnisci2://l:$password@dokku-omnisci-l:5984/l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:link) adds a querystring" {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app --querystring "pool=5"
-  url=$(dokku config:get my_app COUCHDB_URL)
+  url=$(dokku config:get my_app OMNISCI_URL)
   assert_contains "$url" "?pool=5"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
@@ -112,7 +112,7 @@ teardown() {
   dokku "$PLUGIN_COMMAND_PREFIX:link" l my_app --alias "ALIAS"
   url=$(dokku config:get my_app ALIAS_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "$url" "http://l:$password@dokku-couchdb-l:5984/l"
+  assert_contains "$url" "http://l:$password@dokku-omnisci-l:5984/l"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" l my_app
 }
