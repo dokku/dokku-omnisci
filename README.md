@@ -30,7 +30,7 @@ omnisci:linked <service> <app>                 # check if the omnisci service is
 omnisci:links <service>                        # list all apps linked to the omnisci service
 omnisci:list                                   # list all omnisci services
 omnisci:logs <service> [-t|--tail]             # print the most recent log(s) for this service
-omnisci:promote <service> <app>                # promote service <service> as DATABASE_URL in <app>
+omnisci:promote <service> <app>                # promote service <service> as OMNISCI_URL in <app>
 omnisci:restart <service>                      # graceful shutdown and restart of the omnisci service container
 omnisci:start <service>                        # start a previously stopped omnisci service
 omnisci:stop <service>                         # stop a running omnisci service
@@ -61,15 +61,15 @@ dokku omnisci:create lolipop
 You can also specify the image and image version to use for the service. It *must* be compatible with the ${plugin_image} image.
 
 ```shell
-export DATABASE_IMAGE="${PLUGIN_IMAGE}"
-export DATABASE_IMAGE_VERSION="${PLUGIN_IMAGE_VERSION}"
+export OMNISCI_IMAGE="${PLUGIN_IMAGE}"
+export OMNISCI_IMAGE_VERSION="${PLUGIN_IMAGE_VERSION}"
 dokku omnisci:create lolipop
 ```
 
 You can also specify custom environment variables to start the omnisci service in semi-colon separated form.
 
 ```shell
-export DATABASE_CUSTOM_ENV="USER=alpha;HOST=beta"
+export OMNISCI_CUSTOM_ENV="USER=alpha;HOST=beta"
 dokku omnisci:create lolipop
 ```
 
@@ -151,18 +151,18 @@ dokku omnisci:link lolipop playground
 The following environment variables will be set automatically by docker (not on the app itself, so they won’t be listed when calling dokku config):
 
 ```
-DOKKU_DATABASE_LOLIPOP_NAME=/lolipop/DATABASE
-DOKKU_DATABASE_LOLIPOP_PORT=tcp://172.17.0.1:6274
-DOKKU_DATABASE_LOLIPOP_PORT_6274_TCP=tcp://172.17.0.1:6274
-DOKKU_DATABASE_LOLIPOP_PORT_6274_TCP_PROTO=tcp
-DOKKU_DATABASE_LOLIPOP_PORT_6274_TCP_PORT=6274
-DOKKU_DATABASE_LOLIPOP_PORT_6274_TCP_ADDR=172.17.0.1
+DOKKU_OMNISCI_LOLIPOP_NAME=/lolipop/DATABASE
+DOKKU_OMNISCI_LOLIPOP_PORT=tcp://172.17.0.1:6274
+DOKKU_OMNISCI_LOLIPOP_PORT_6274_TCP=tcp://172.17.0.1:6274
+DOKKU_OMNISCI_LOLIPOP_PORT_6274_TCP_PROTO=tcp
+DOKKU_OMNISCI_LOLIPOP_PORT_6274_TCP_PORT=6274
+DOKKU_OMNISCI_LOLIPOP_PORT_6274_TCP_ADDR=172.17.0.1
 ```
 
 The following will be set on the linked application by default:
 
 ```
-DATABASE_URL=omnisci://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
+OMNISCI_URL=omnisci://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
 ```
 
 The host exposed here only works internally in docker containers. If you want your container to be reachable from outside, you should use the 'expose' subcommand. Another service can be linked to your app:
@@ -171,14 +171,14 @@ The host exposed here only works internally in docker containers. If you want yo
 dokku omnisci:link other_service playground
 ```
 
-It is possible to change the protocol for database_url by setting the environment variable database_database_scheme on the app. Doing so will after linking will cause the plugin to think the service is not linked, and we advise you to unlink before proceeding.
+It is possible to change the protocol for omnisci_url by setting the environment variable omnisci_database_scheme on the app. Doing so will after linking will cause the plugin to think the service is not linked, and we advise you to unlink before proceeding.
 
 ```shell
-dokku config:set playground DATABASE_DATABASE_SCHEME=omnisci2
+dokku config:set playground OMNISCI_DATABASE_SCHEME=omnisci2
 dokku omnisci:link lolipop playground
 ```
 
-This will cause database_url to be set as:
+This will cause omnisci_url to be set as:
 
 ```
 omnisci2://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
@@ -261,7 +261,7 @@ Unexpose the service, removing access to it from the public interface (0. 0. 0. 
 dokku omnisci:unexpose lolipop
 ```
 
-### promote service <service> as DATABASE_URL in <app>
+### promote service <service> as OMNISCI_URL in <app>
 
 ```shell
 # usage
@@ -271,7 +271,7 @@ dokku omnisci:promote <service> <app>
 If you have a omnisci service linked to an app and try to link another omnisci service another link environment variable will be generated automatically:
 
 ```
-DOKKU_DATABASE_BLUE_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
+DOKKU_OMNISCI_BLUE_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
 ```
 
 You can promote the new service to be the primary one:
@@ -282,12 +282,12 @@ You can promote the new service to be the primary one:
 dokku omnisci:promote other_service playground
 ```
 
-This will replace database_url with the url from other_service and generate another environment variable to hold the previous value if necessary. You could end up with the following for example:
+This will replace omnisci_url with the url from other_service and generate another environment variable to hold the previous value if necessary. You could end up with the following for example:
 
 ```
-DATABASE_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
-DOKKU_DATABASE_BLUE_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
-DOKKU_DATABASE_SILVER_URL=omnisci://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
+OMNISCI_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
+DOKKU_OMNISCI_BLUE_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
+DOKKU_OMNISCI_SILVER_URL=omnisci://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
 ```
 
 ### start a previously stopped omnisci service
