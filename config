@@ -4,7 +4,7 @@ export OMNISCI_IMAGE_VERSION=${OMNISCI_IMAGE_VERSION:="v5.1.2"}
 export OMNISCI_ROOT=${OMNISCI_ROOT:="$DOKKU_LIB_ROOT/services/omnisci"}
 export OMNISCI_HOST_ROOT=${OMNISCI_HOST_ROOT:=$OMNISCI_ROOT}
 
-export PLUGIN_UNIMPLEMENTED_SUBCOMMANDS=()
+export PLUGIN_UNIMPLEMENTED_SUBCOMMANDS=("backup" "backup-auth" "backup-deauth" "backup-schedule" "backup-schedule-cat" "backup-set-encryption" "backup-unschedule" "backup-unset-encryption" "clone" "export" "import")
 export PLUGIN_COMMAND_PREFIX="omnisci"
 export PLUGIN_CONFIG_ROOT=${PLUGIN_CONFIG_ROOT:="$DOKKU_LIB_ROOT/config/$PLUGIN_COMMAND_PREFIX"}
 export PLUGIN_DATA_ROOT=$OMNISCI_ROOT
