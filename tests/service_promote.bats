@@ -40,15 +40,15 @@ teardown() {
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) changes OMNISCI_URL" {
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "OMNISCI_URL=http://u:p@host:5984/db" "DOKKU_OMNISCI_BLUE_URL=http://l:$password@dokku-omnisci-l:5984/l"
+  dokku config:set my_app "OMNISCI_URL=http://u:p@host:6274/db" "DOKKU_OMNISCI_BLUE_URL=http://l:$password@dokku-omnisci-l:6274/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
   url=$(dokku config:get my_app OMNISCI_URL)
-  assert_equal "$url" "http://l:$password@dokku-omnisci-l:5984/l"
+  assert_equal "$url" "http://l:$password@dokku-omnisci-l:6274/l"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) creates new config url when needed" {
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "OMNISCI_URL=http://u:p@host:5984/db" "DOKKU_OMNISCI_BLUE_URL=http://l:$password@dokku-omnisci-l:5984/l"
+  dokku config:set my_app "OMNISCI_URL=http://u:p@host:6274/db" "DOKKU_OMNISCI_BLUE_URL=http://l:$password@dokku-omnisci-l:6274/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
   run dokku config my_app
   assert_contains "${lines[*]}" "DOKKU_OMNISCI_"
@@ -56,8 +56,8 @@ teardown() {
 
 @test "($PLUGIN_COMMAND_PREFIX:promote) uses OMNISCI_DATABASE_SCHEME variable" {
   password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  dokku config:set my_app "OMNISCI_DATABASE_SCHEME=omnisci2" "OMNISCI_URL=http://u:p@host:5984/db" "DOKKU_OMNISCI_BLUE_URL=omnisci2://l:$password@dokku-omnisci-l:5984/l"
+  dokku config:set my_app "OMNISCI_DATABASE_SCHEME=omnisci2" "OMNISCI_URL=http://u:p@host:6274/db" "DOKKU_OMNISCI_BLUE_URL=omnisci2://l:$password@dokku-omnisci-l:6274/l"
   dokku "$PLUGIN_COMMAND_PREFIX:promote" l my_app
   url=$(dokku config:get my_app OMNISCI_URL)
-  assert_contains "$url" "omnisci2://l:$password@dokku-omnisci-l:5984/l"
+  assert_contains "$url" "omnisci2://l:$password@dokku-omnisci-l:6274/l"
 }
