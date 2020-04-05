@@ -85,8 +85,10 @@ service_create_container() {
   docker run --rm --link "$SERVICE_NAME:$PLUGIN_COMMAND_PREFIX" "$PLUGIN_WAIT_IMAGE" -p "$PLUGIN_DATASTORE_WAIT_PORT" >/dev/null
 
   dokku_log_verbose_quiet "Creating container user"
-  echo "ALTER USER admin (password = '${ROOTPASSWORD}');" | docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p HyperInteractive
-  echo "CREATE USER omnisci (password = '${PASSWORD}', is_super = 'true', default_db='${DATABASE_NAME}');" | docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p "$ROOTPASSWORD"
+  echo "ALTER USER admin (password = '${ROOTPASSWORD}');" | docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p HyperInteractive >/dev/null
+  echo "CREATE USER omnisci (password = '${PASSWORD}', is_super = 'true');" | docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p "$ROOTPASSWORD" >/dev/null
+  echo "CREATE DATABASE IF NOT EXISTS ${DATABASE_NAME} (owner = 'omnisci');" | docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p "$ROOTPASSWORD" >/dev/null
+  echo "ALTER USER omnisci (default_db='${DATABASE_NAME}');" | docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p HyperInteractive >/dev/null
 
   dokku_log_info2 "$PLUGIN_SERVICE container created: $SERVICE"
   service_info "$SERVICE"
