@@ -17,37 +17,26 @@ sudo dokku plugin:install https://github.com/dokku/dokku-omnisci.git omnisci
 ## Commands
 
 ```
-omnisci:app-links <app>                            # list all omnisci service links for a given app
-omnisci:backup <service> <bucket-name> [--use-iam] # creates a backup of the omnisci service to an existing s3 bucket
-omnisci:backup-auth <service> <aws-access-key-id> <aws-secret-access-key> <aws-default-region> <aws-signature-version> <endpoint-url> # sets up authentication for backups on the omnisci service
-omnisci:backup-deauth <service>                    # removes backup authentication for the omnisci service
-omnisci:backup-schedule <service> <schedule> <bucket-name> [--use-iam] # schedules a backup of the omnisci service
-omnisci:backup-schedule-cat <service>              # cat the contents of the configured backup cronfile for the service
-omnisci:backup-set-encryption <service> <passphrase> # sets encryption for all future backups of omnisci service
-omnisci:backup-unschedule <service>                # unschedules the backup of the omnisci service
-omnisci:backup-unset-encryption <service>          # unsets encryption for future backups of the omnisci service
-omnisci:clone <service> <new-service> [--clone-flags...] # create container <new-name> then copy data from <name> into <new-name>
-omnisci:connect <service>                          # connect to the service via the omnisci connection tool
-omnisci:create <service> [--create-flags...]       # create a omnisci service
-omnisci:destroy <service> [-f|--force]             # delete the omnisci service/data/container if there are no links left
-omnisci:enter <service>                            # enter or run a command in a running omnisci service container
-omnisci:exists <service>                           # check if the omnisci service exists
-omnisci:export <service>                           # export a dump of the omnisci service database
-omnisci:expose <service> <ports...>                # expose a omnisci service on custom port if provided (random port otherwise)
-omnisci:import <service>                           # import a dump into the omnisci service database
-omnisci:info <service> [--single-info-flag]        # print the service information
-omnisci:link <service> <app> [--link-flags...]     # link the omnisci service to the app
-omnisci:linked <service> <app>                     # check if the omnisci service is linked to an app
-omnisci:links <service>                            # list all apps linked to the omnisci service
-omnisci:list                                       # list all omnisci services
-omnisci:logs <service> [-t|--tail]                 # print the most recent log(s) for this service
-omnisci:promote <service> <app>                    # promote service <service> as DATABASE_URL in <app>
-omnisci:restart <service>                          # graceful shutdown and restart of the omnisci service container
-omnisci:start <service>                            # start a previously stopped omnisci service
-omnisci:stop <service>                             # stop a running omnisci service
-omnisci:unexpose <service>                         # unexpose a previously exposed omnisci service
-omnisci:unlink <service> <app>                     # unlink the omnisci service from the app
-omnisci:upgrade <service> [--upgrade-flags...]     # upgrade service <service> to the specified versions
+omnisci:app-links <app>                        # list all omnisci service links for a given app
+omnisci:connect <service>                      # connect to the service via the omnisci connection tool
+omnisci:create <service> [--create-flags...]   # create a omnisci service
+omnisci:destroy <service> [-f|--force]         # delete the omnisci service/data/container if there are no links left
+omnisci:enter <service>                        # enter or run a command in a running omnisci service container
+omnisci:exists <service>                       # check if the omnisci service exists
+omnisci:expose <service> <ports...>            # expose a omnisci service on custom port if provided (random port otherwise)
+omnisci:info <service> [--single-info-flag]    # print the service information
+omnisci:link <service> <app> [--link-flags...] # link the omnisci service to the app
+omnisci:linked <service> <app>                 # check if the omnisci service is linked to an app
+omnisci:links <service>                        # list all apps linked to the omnisci service
+omnisci:list                                   # list all omnisci services
+omnisci:logs <service> [-t|--tail]             # print the most recent log(s) for this service
+omnisci:promote <service> <app>                # promote service <service> as DATABASE_URL in <app>
+omnisci:restart <service>                      # graceful shutdown and restart of the omnisci service container
+omnisci:start <service>                        # start a previously stopped omnisci service
+omnisci:stop <service>                         # stop a running omnisci service
+omnisci:unexpose <service>                     # unexpose a previously exposed omnisci service
+omnisci:unlink <service> <app>                 # unlink the omnisci service from the app
+omnisci:upgrade <service> [--upgrade-flags...] # upgrade service <service> to the specified versions
 ```
 
 ## Usage
@@ -370,19 +359,6 @@ List all omnisci services that are linked to the 'playground' app.
 dokku omnisci:app-links playground
 ```
 
-### create container <new-name> then copy data from <name> into <new-name>
-
-```shell
-# usage
-dokku omnisci:clone <service> <new-service> [--clone-flags...]
-```
-
-You can clone an existing service to a new one:
-
-```shell
-dokku omnisci:clone lolipop lolipop-2
-```
-
 ### check if the omnisci service exists
 
 ```shell
@@ -420,180 +396,6 @@ List all apps linked to the 'lolipop' omnisci service.
 
 ```shell
 dokku omnisci:links lolipop
-```
-
-### Data Management
-
-The underlying service data can be imported and exported with the following commands:
-
-### import a dump into the omnisci service database
-
-```shell
-# usage
-dokku omnisci:import <service>
-```
-
-Import a datastore dump:
-
-```shell
-dokku omnisci:import lolipop < database.dump
-```
-
-### export a dump of the omnisci service database
-
-```shell
-# usage
-dokku omnisci:export <service>
-```
-
-By default, datastore output is exported to stdout:
-
-```shell
-dokku omnisci:export lolipop
-```
-
-You can redirect this output to a file:
-
-```shell
-dokku omnisci:export lolipop > lolipop.dump
-```
-
-### Backups
-
-Datastore backups are supported via AWS S3 and S3 compatible services like [minio](https://github.com/minio/minio).
-
-You may skip the `backup-auth` step if your dokku install is running within EC2 and has access to the bucket via an IAM profile. In that case, use the `--use-iam` option with the `backup` command.
-
-Backups can be performed using the backup commands:
-
-### sets up authentication for backups on the omnisci service
-
-```shell
-# usage
-dokku omnisci:backup-auth <service> <aws-access-key-id> <aws-secret-access-key> <aws-default-region> <aws-signature-version> <endpoint-url>
-```
-
-Setup s3 backup authentication:
-
-```shell
-dokku omnisci:backup-auth lolipop AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
-```
-
-Setup s3 backup authentication with different region:
-
-```shell
-dokku omnisci:backup-auth lolipop AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION
-```
-
-Setup s3 backup authentication with different signature version and endpoint:
-
-```shell
-dokku omnisci:backup-auth lolipop AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION AWS_SIGNATURE_VERSION ENDPOINT_URL
-```
-
-More specific example for minio auth:
-
-```shell
-dokku omnisci:backup-auth lolipop MINIO_ACCESS_KEY_ID MINIO_SECRET_ACCESS_KEY us-east-1 s3v4 https://YOURMINIOSERVICE
-```
-
-### removes backup authentication for the omnisci service
-
-```shell
-# usage
-dokku omnisci:backup-deauth <service>
-```
-
-Remove s3 authentication:
-
-```shell
-dokku omnisci:backup-deauth lolipop
-```
-
-### creates a backup of the omnisci service to an existing s3 bucket
-
-```shell
-# usage
-dokku omnisci:backup <service> <bucket-name> [--use-iam]
-```
-
-Backup the 'lolipop' service to the 'my-s3-bucket' bucket on aws:
-
-```shell
-dokku omnisci:backup lolipop my-s3-bucket --use-iam
-```
-
-### sets encryption for all future backups of omnisci service
-
-```shell
-# usage
-dokku omnisci:backup-set-encryption <service> <passphrase>
-```
-
-Set a gpg passphrase for backups:
-
-```shell
-dokku omnisci:backup-set-encryption lolipop
-```
-
-### unsets encryption for future backups of the omnisci service
-
-```shell
-# usage
-dokku omnisci:backup-unset-encryption <service>
-```
-
-Unset a gpg encryption key for backups:
-
-```shell
-dokku omnisci:backup-unset-encryption lolipop
-```
-
-### schedules a backup of the omnisci service
-
-```shell
-# usage
-dokku omnisci:backup-schedule <service> <schedule> <bucket-name> [--use-iam]
-```
-
-Schedule a backup:
-
-> 'schedule' is a crontab expression, eg. "0 3 * * *" for each day at 3am
-
-```shell
-dokku omnisci:backup-schedule lolipop "0 3 * * *" my-s3-bucket
-```
-
-Schedule a backup and authenticate via iam:
-
-```shell
-dokku omnisci:backup-schedule lolipop "0 3 * * *" my-s3-bucket --use-iam
-```
-
-### cat the contents of the configured backup cronfile for the service
-
-```shell
-# usage
-dokku omnisci:backup-schedule-cat <service>
-```
-
-Cat the contents of the configured backup cronfile for the service:
-
-```shell
-dokku omnisci:backup-schedule-cat lolipop
-```
-
-### unschedules the backup of the omnisci service
-
-```shell
-# usage
-dokku omnisci:backup-unschedule <service>
-```
-
-Remove the scheduled backup from cron:
-
-```shell
-dokku omnisci:backup-unschedule lolipop
 ```
 
 ### Disabling `docker pull` calls
