@@ -8,6 +8,7 @@ jobs:
       image: ubuntu-1604:201903-01
     steps:
       - checkout
+      - run: pyenv global 3.7.0
       - run: make setup
       - run: sudo sysctl -w vm.max_map_count=262144
       - run:
@@ -35,6 +36,7 @@ jobs:
       image: ubuntu-1604:201903-01
     steps:
       - checkout
+      - run: pyenv global 3.7.0
       - run: make setup
       - run: sudo sysctl -w vm.max_map_count=262144
       - run:
