@@ -15,7 +15,7 @@ commands:
       - run:
           command: |
             make generate;
-            if [[ $(git diff) ]]; then
+            if [[ $(git --no-pager diff) ]]; then
               echo "Please run `make generate`";
               git status --short;
               git diff;
