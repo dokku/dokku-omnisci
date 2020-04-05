@@ -82,7 +82,8 @@ service_create_container() {
   echo "$ID" >"$SERVICE_ROOT/ID"
 
   dokku_log_verbose_quiet "Creating container user"
-  docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" mapd /omnisci/bin/omnisql "CREATE USER omnisci (password = '${PASSWORD}', is_super = 'true', default_db='${DATABASE_NAME}');"
+  docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p HyperInteractive "ALTER USER admin (password = '${ROOTPASSWORD}');"
+  docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p "$ROOTPASSWORD" "CREATE USER omnisci (password = '${PASSWORD}', is_super = 'true', default_db='${DATABASE_NAME}');"
 
   dokku_log_verbose_quiet "Waiting for container to be ready"
   docker run --rm --link "$SERVICE_NAME:$PLUGIN_COMMAND_PREFIX" "$PLUGIN_WAIT_IMAGE" -p "$PLUGIN_DATASTORE_WAIT_PORT" >/dev/null
