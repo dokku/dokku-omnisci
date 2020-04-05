@@ -17,7 +17,7 @@ service_connect() {
   local SERVICE_TTY_OPTS
   has_tty && SERVICE_TTY_OPTS="-t"
 
-  docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" mapd /omnisci/bin/omnisql
+  docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" /omnisci/bin/mapdql -p "$PASSWORD"
 }
 
 service_create() {
