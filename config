@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 export OMNISCI_IMAGE=${OMNISCI_IMAGE:="omnisci/core-os-cpu"}
-export OMNISCI_IMAGE_VERSION=${OMNISCI_IMAGE_VERSION:="v4.7.1"}
+export OMNISCI_IMAGE_VERSION=${OMNISCI_IMAGE_VERSION:="v5.1.2"}
 export OMNISCI_ROOT=${OMNISCI_ROOT:="$DOKKU_LIB_ROOT/services/omnisci"}
 export OMNISCI_HOST_ROOT=${OMNISCI_HOST_ROOT:=$OMNISCI_ROOT}
 
-export PLUGIN_UNIMPLEMENTED_SUBCOMMANDS=()
+export PLUGIN_UNIMPLEMENTED_SUBCOMMANDS=("backup" "backup-auth" "backup-deauth" "backup-schedule" "backup-schedule-cat" "backup-set-encryption" "backup-unschedule" "backup-unset-encryption" "clone" "export" "import")
 export PLUGIN_COMMAND_PREFIX="omnisci"
 export PLUGIN_CONFIG_ROOT=${PLUGIN_CONFIG_ROOT:="$DOKKU_LIB_ROOT/config/$PLUGIN_COMMAND_PREFIX"}
 export PLUGIN_DATA_ROOT=$OMNISCI_ROOT
 export PLUGIN_DATA_HOST_ROOT=$OMNISCI_HOST_ROOT
-export PLUGIN_DATASTORE_PORTS=(6274)
+export PLUGIN_DATASTORE_PORTS=(6274 6278)
 export PLUGIN_DATASTORE_WAIT_PORT=6274
-export PLUGIN_DEFAULT_ALIAS="DATABASE"
+export PLUGIN_DEFAULT_ALIAS="OMNISCI"
 export PLUGIN_DISABLE_PULL=${OMNISCI_DISABLE_PULL:=}
 export PLUGIN_DISABLE_PULL_VARIABLE="OMNISCI_DISABLE_PULL"
 export PLUGIN_ALT_ALIAS="DOKKU_OMNISCI"
@@ -24,3 +24,8 @@ export PLUGIN_BASE_PATH="$PLUGIN_PATH"
 if [[ -n $DOKKU_API_VERSION ]]; then
   export PLUGIN_BASE_PATH="$PLUGIN_ENABLED_PATH"
 fi
+
+export PLUGIN_BUSYBOX_IMAGE="busybox:1.31.1-uclibc"
+export PLUGIN_AMBASSADOR_IMAGE="dokku/ambassador:0.3.3"
+export PLUGIN_S3BACKUP_IMAGE="dokku/s3backup:0.10.3"
+export PLUGIN_WAIT_IMAGE="dokku/wait:0.4.3"

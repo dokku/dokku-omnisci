@@ -1,5 +1,9 @@
 HARDWARE = $(shell uname -m)
 SYSTEM_NAME  = $(shell uname -s | tr '[:upper:]' '[:lower:]')
+SHFMT_VERSION = 3.0.2
+XUNIT_TO_GITHUB_VERSION = 0.3.0
+XUNIT_READER_VERSION = 0.1.0
+
 
 bats:
 ifeq ($(SYSTEM_NAME),darwin)
@@ -28,7 +32,7 @@ ifneq ($(shell shfmt --version >/dev/null 2>&1 ; echo $$?),0)
 ifeq ($(shfmt),Darwin)
 	brew install shfmt
 else
-	wget -qO /tmp/shfmt https://github.com/mvdan/sh/releases/download/v2.6.2/shfmt_v2.6.2_linux_amd64
+	wget -qO /tmp/shfmt https://github.com/mvdan/sh/releases/download/v$(SHFMT_VERSION)/shfmt_v$(SHFMT_VERSION)_linux_amd64
 	chmod +x /tmp/shfmt
 	sudo mv /tmp/shfmt /usr/local/bin/shfmt
 endif
@@ -61,9 +65,15 @@ unit-tests:
 	@cd tests && echo "executing tests: $(shell cd tests ; ls *.bats | xargs)"
 	cd tests && bats --formatter bats-format-junit -e -T -o ../tmp/test-results/bats *.bats
 
+tmp/xunit-reader:
+	mkdir -p tmp
+	curl -o tmp/xunit-reader.tgz -sL https://github.com/josegonzalez/go-xunit-reader/releases/download/v$(XUNIT_READER_VERSION)/xunit-reader_$(XUNIT_READER_VERSION)_$(SYSTEM_NAME)_$(HARDWARE).tgz
+	tar xf tmp/xunit-reader.tgz -C tmp
+	chmod +x tmp/xunit-reader
+
 tmp/xunit-to-github:
 	mkdir -p tmp
-	curl -o tmp/xunit-to-github.tgz -sL https://github.com/josegonzalez/go-xunit-to-github/releases/download/v0.3.0/xunit-to-github_0.3.0_$(SYSTEM_NAME)_$(HARDWARE).tgz
+	curl -o tmp/xunit-to-github.tgz -sL https://github.com/josegonzalez/go-xunit-to-github/releases/download/v$(XUNIT_TO_GITHUB_VERSION)/xunit-to-github_$(XUNIT_TO_GITHUB_VERSION)_$(SYSTEM_NAME)_$(HARDWARE).tgz
 	tar xf tmp/xunit-to-github.tgz -C tmp
 	chmod +x tmp/xunit-to-github
 
@@ -73,7 +83,9 @@ setup:
 
 test: lint unit-tests
 
-report: tmp/xunit-to-github
+report: tmp/xunit-reader tmp/xunit-to-github
+	tmp/xunit-reader -p 'tmp/test-results/bats/*.xml'
+	tmp/xunit-reader -p 'tmp/test-results/shellcheck/*.xml'
 ifdef TRAVIS_REPO_SLUG
 ifdef GITHUB_ACCESS_TOKEN
 ifneq ($(TRAVIS_PULL_REQUEST),false)
@@ -81,3 +93,14 @@ ifneq ($(TRAVIS_PULL_REQUEST),false)
 endif
 endif
 endif
+
+.PHONY: clean
+clean:
+	rm -f README.md
+
+.PHONY: generate
+generate: clean README.md
+
+.PHONY: README.md
+README.md:
+	bin/generate
