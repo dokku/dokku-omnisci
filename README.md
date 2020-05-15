@@ -66,15 +66,15 @@ Create a omnisci service named lolipop:
 dokku omnisci:create lolipop
 ```
 
-You can also specify the image and image version to use for the service. It *must* be compatible with the ${plugin_image} image.
+You can also specify the image and image version to use for the service. It *must* be compatible with the omnisci/core-os-cpu image. 
 
 ```shell
-export OMNISCI_IMAGE="${PLUGIN_IMAGE}"
+export OMNISCI_IMAGE="omnisci/core-os-cpu"
 export OMNISCI_IMAGE_VERSION="${PLUGIN_IMAGE_VERSION}"
 dokku omnisci:create lolipop
 ```
 
-You can also specify custom environment variables to start the omnisci service in semi-colon separated form.
+You can also specify custom environment variables to start the omnisci service in semi-colon separated form. 
 
 ```shell
 export OMNISCI_CUSTOM_ENV="USER=alpha;HOST=beta"
@@ -170,7 +170,7 @@ flags:
 - `-a|--alias "BLUE_DATABASE"`: an alternative alias to use for linking to an app via environment variable
 - `-q|--querystring "pool=5"`: ampersand delimited querystring arguments to append to the service link
 
-A omnisci service can be linked to a container. This will use native docker links via the docker-options plugin. Here we link it to our 'playground' app.
+A omnisci service can be linked to a container. This will use native docker links via the docker-options plugin. Here we link it to our 'playground' app. 
 
 > NOTE: this will restart your app
 
@@ -201,14 +201,14 @@ The host exposed here only works internally in docker containers. If you want yo
 dokku omnisci:link other_service playground
 ```
 
-It is possible to change the protocol for omnisci_url by setting the environment variable omnisci_database_scheme on the app. Doing so will after linking will cause the plugin to think the service is not linked, and we advise you to unlink before proceeding.
+It is possible to change the protocol for `OMNISCI_URL` by setting the environment variable `OMNISCI_DATABASE_SCHEME` on the app. Doing so will after linking will cause the plugin to think the service is not linked, and we advise you to unlink before proceeding. 
 
 ```shell
 dokku config:set playground OMNISCI_DATABASE_SCHEME=omnisci2
 dokku omnisci:link lolipop playground
 ```
 
-This will cause omnisci_url to be set as:
+This will cause `OMNISCI_URL` to be set as:
 
 ```
 omnisci2://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
@@ -253,13 +253,13 @@ dokku omnisci:connect lolipop
 dokku omnisci:enter <service>
 ```
 
-A bash prompt can be opened against a running service. Filesystem changes will not be saved to disk.
+A bash prompt can be opened against a running service. Filesystem changes will not be saved to disk. 
 
 ```shell
 dokku omnisci:enter lolipop
 ```
 
-You may also run a command directly against the service. Filesystem changes will not be saved to disk.
+You may also run a command directly against the service. Filesystem changes will not be saved to disk. 
 
 ```shell
 dokku omnisci:enter lolipop touch /tmp/test
@@ -272,10 +272,10 @@ dokku omnisci:enter lolipop touch /tmp/test
 dokku omnisci:expose <service> <ports...>
 ```
 
-Expose the service on the service's normal ports, allowing access to it from the public interface (0. 0. 0. 0):
+Expose the service on the service's normal ports, allowing access to it from the public interface (`0.0.0.0`):
 
 ```shell
-dokku omnisci:expose lolipop ${PLUGIN_DATASTORE_PORTS[@]}
+dokku omnisci:expose lolipop 6274 6278
 ```
 
 ### unexpose a previously exposed omnisci service
@@ -285,7 +285,7 @@ dokku omnisci:expose lolipop ${PLUGIN_DATASTORE_PORTS[@]}
 dokku omnisci:unexpose <service>
 ```
 
-Unexpose the service, removing access to it from the public interface (0. 0. 0. 0):
+Unexpose the service, removing access to it from the public interface (`0.0.0.0`):
 
 ```shell
 dokku omnisci:unexpose lolipop
@@ -312,7 +312,7 @@ You can promote the new service to be the primary one:
 dokku omnisci:promote other_service playground
 ```
 
-This will replace omnisci_url with the url from other_service and generate another environment variable to hold the previous value if necessary. You could end up with the following for example:
+This will replace `OMNISCI_URL` with the url from other_service and generate another environment variable to hold the previous value if necessary. You could end up with the following for example:
 
 ```
 OMNISCI_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
@@ -390,7 +390,7 @@ Service scripting can be executed using the following commands:
 dokku omnisci:app-links <app>
 ```
 
-List all omnisci services that are linked to the 'playground' app.
+List all omnisci services that are linked to the 'playground' app. 
 
 ```shell
 dokku omnisci:app-links playground
@@ -403,7 +403,7 @@ dokku omnisci:app-links playground
 dokku omnisci:exists <service>
 ```
 
-Here we check if the lolipop omnisci service exists.
+Here we check if the lolipop omnisci service exists. 
 
 ```shell
 dokku omnisci:exists lolipop
@@ -416,7 +416,7 @@ dokku omnisci:exists lolipop
 dokku omnisci:linked <service> <app>
 ```
 
-Here we check if the lolipop omnisci service is linked to the 'playground' app.
+Here we check if the lolipop omnisci service is linked to the 'playground' app. 
 
 ```shell
 dokku omnisci:linked lolipop playground
@@ -429,7 +429,7 @@ dokku omnisci:linked lolipop playground
 dokku omnisci:links <service>
 ```
 
-List all apps linked to the 'lolipop' omnisci service.
+List all apps linked to the 'lolipop' omnisci service. 
 
 ```shell
 dokku omnisci:links lolipop
