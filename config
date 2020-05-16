@@ -21,6 +21,7 @@ export PLUGIN_SCHEME="omnisci"
 export PLUGIN_SERVICE="Omnisci"
 export PLUGIN_VARIABLE="OMNISCI"
 export PLUGIN_BASE_PATH="$PLUGIN_PATH"
+export PLUGIN_CONFIG_SUFFIX="config"
 if [[ -n $DOKKU_API_VERSION ]]; then
   export PLUGIN_BASE_PATH="$PLUGIN_ENABLED_PATH"
 fi
