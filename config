@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-export OMNISCI_IMAGE=${OMNISCI_IMAGE:="omnisci/core-os-cpu"}
-export OMNISCI_IMAGE_VERSION=${OMNISCI_IMAGE_VERSION:="v5.1.2"}
+export OMNISCI_IMAGE=${OMNISCI_IMAGE:="$(awk -F '[ :]' '{print $2}' Dockerfile)"}
+export OMNISCI_IMAGE_VERSION=${OMNISCI_IMAGE_VERSION:="$(awk -F '[ :]' '{print $3}' Dockerfile)"}
 export OMNISCI_ROOT=${OMNISCI_ROOT:="$DOKKU_LIB_ROOT/services/omnisci"}
 export OMNISCI_HOST_ROOT=${OMNISCI_HOST_ROOT:=$OMNISCI_ROOT}
 
