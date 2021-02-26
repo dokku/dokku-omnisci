@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-export OMNISCI_IMAGE=${OMNISCI_IMAGE:="$(awk -F '[ :]' '{print $2}' Dockerfile)"}
-export OMNISCI_IMAGE_VERSION=${OMNISCI_IMAGE_VERSION:="$(awk -F '[ :]' '{print $3}' Dockerfile)"}
+_DIR="$(dirname $0)"
+export OMNISCI_IMAGE=${OMNISCI_IMAGE:="$(awk -F '[ :]' '{print $2}' $_DIR/Dockerfile)"}
+export OMNISCI_IMAGE_VERSION=${OMNISCI_IMAGE_VERSION:="$(awk -F '[ :]' '{print $3}' $_DIR/Dockerfile)"}
 export OMNISCI_ROOT=${OMNISCI_ROOT:="$DOKKU_LIB_ROOT/services/omnisci"}
 export OMNISCI_HOST_ROOT=${OMNISCI_HOST_ROOT:=$OMNISCI_ROOT}
 
