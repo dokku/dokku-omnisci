@@ -1,1 +1,1 @@
-FROM omnisci/core-os-cpu:v5.1.2
+FROM omnisci/core-os-cpu:v5.6.0
