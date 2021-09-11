@@ -1,4 +1,4 @@
-# dokku omnisci [![Build Status](https://img.shields.io/circleci/project/github/dokku/dokku-omnisci.svg?branch=master&style=flat-square "Build Status")](https://circleci.com/gh/dokku/dokku-omnisci/tree/master) [![IRC Network](https://img.shields.io/badge/irc-freenode-blue.svg?style=flat-square "IRC Freenode")](https://webchat.freenode.net/?channels=dokku)
+# dokku omnisci [![Build Status](https://img.shields.io/github/workflow/status/dokku/dokku-omnisci/CI/master?style=flat-square "Build Status")](https://github.com/dokku/dokku-omnisci/actions/workflows/ci.yml?query=branch%3Amaster) [![IRC Network](https://img.shields.io/badge/irc-libera-blue.svg?style=flat-square "IRC Libera")](https://webchat.libera.chat/?channels=dokku)
 
 Official omnisci plugin for dokku. Currently defaults to installing [omnisci/core-os-cpu v5.1.2](https://hub.docker.com/r/omnisci/core-os-cpu/).
 
