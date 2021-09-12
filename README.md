@@ -66,7 +66,7 @@ Create a omnisci service named lolipop:
 dokku omnisci:create lolipop
 ```
 
-You can also specify the image and image version to use for the service. It *must* be compatible with the omnisci/core-os-cpu image. 
+You can also specify the image and image version to use for the service. It *must* be compatible with the omnisci/core-os-cpu image.
 
 ```shell
 export OMNISCI_IMAGE="omnisci/core-os-cpu"
@@ -74,7 +74,7 @@ export OMNISCI_IMAGE_VERSION="${PLUGIN_IMAGE_VERSION}"
 dokku omnisci:create lolipop
 ```
 
-You can also specify custom environment variables to start the omnisci service in semi-colon separated form. 
+You can also specify custom environment variables to start the omnisci service in semi-colon separated form.
 
 ```shell
 export OMNISCI_CUSTOM_ENV="USER=alpha;HOST=beta"
@@ -170,7 +170,7 @@ flags:
 - `-a|--alias "BLUE_DATABASE"`: an alternative alias to use for linking to an app via environment variable
 - `-q|--querystring "pool=5"`: ampersand delimited querystring arguments to append to the service link
 
-A omnisci service can be linked to a container. This will use native docker links via the docker-options plugin. Here we link it to our 'playground' app. 
+A omnisci service can be linked to a container. This will use native docker links via the docker-options plugin. Here we link it to our `playground` app.
 
 > NOTE: this will restart your app
 
@@ -195,13 +195,13 @@ The following will be set on the linked application by default:
 OMNISCI_URL=omnisci://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
 ```
 
-The host exposed here only works internally in docker containers. If you want your container to be reachable from outside, you should use the 'expose' subcommand. Another service can be linked to your app:
+The host exposed here only works internally in docker containers. If you want your container to be reachable from outside, you should use the `expose` subcommand. Another service can be linked to your app:
 
 ```shell
 dokku omnisci:link other_service playground
 ```
 
-It is possible to change the protocol for `OMNISCI_URL` by setting the environment variable `OMNISCI_DATABASE_SCHEME` on the app. Doing so will after linking will cause the plugin to think the service is not linked, and we advise you to unlink before proceeding. 
+It is possible to change the protocol for `OMNISCI_URL` by setting the environment variable `OMNISCI_DATABASE_SCHEME` on the app. Doing so will after linking will cause the plugin to think the service is not linked, and we advise you to unlink before proceeding.
 
 ```shell
 dokku config:set playground OMNISCI_DATABASE_SCHEME=omnisci2
@@ -253,13 +253,13 @@ dokku omnisci:connect lolipop
 dokku omnisci:enter <service>
 ```
 
-A bash prompt can be opened against a running service. Filesystem changes will not be saved to disk. 
+A bash prompt can be opened against a running service. Filesystem changes will not be saved to disk.
 
 ```shell
 dokku omnisci:enter lolipop
 ```
 
-You may also run a command directly against the service. Filesystem changes will not be saved to disk. 
+You may also run a command directly against the service. Filesystem changes will not be saved to disk.
 
 ```shell
 dokku omnisci:enter lolipop touch /tmp/test
@@ -390,7 +390,7 @@ Service scripting can be executed using the following commands:
 dokku omnisci:app-links <app>
 ```
 
-List all omnisci services that are linked to the 'playground' app. 
+List all omnisci services that are linked to the `playground` app.
 
 ```shell
 dokku omnisci:app-links playground
@@ -403,7 +403,7 @@ dokku omnisci:app-links playground
 dokku omnisci:exists <service>
 ```
 
-Here we check if the lolipop omnisci service exists. 
+Here we check if the lolipop omnisci service exists.
 
 ```shell
 dokku omnisci:exists lolipop
@@ -416,7 +416,7 @@ dokku omnisci:exists lolipop
 dokku omnisci:linked <service> <app>
 ```
 
-Here we check if the lolipop omnisci service is linked to the 'playground' app. 
+Here we check if the lolipop omnisci service is linked to the `playground` app.
 
 ```shell
 dokku omnisci:linked lolipop playground
@@ -429,7 +429,7 @@ dokku omnisci:linked lolipop playground
 dokku omnisci:links <service>
 ```
 
-List all apps linked to the 'lolipop' omnisci service. 
+List all apps linked to the `lolipop` omnisci service.
 
 ```shell
 dokku omnisci:links lolipop
