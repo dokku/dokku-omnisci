@@ -23,7 +23,7 @@ omnisci:create <service> [--create-flags...]   # create a omnisci service
 omnisci:destroy <service> [-f|--force]         # delete the omnisci service/data/container if there are no links left
 omnisci:enter <service>                        # enter or run a command in a running omnisci service container
 omnisci:exists <service>                       # check if the omnisci service exists
-omnisci:expose <service> <ports...>            # expose a omnisci service on custom port if provided (random port otherwise)
+omnisci:expose <service> <ports...>            # expose a omnisci service on custom host:port if provided (random port on the 0.0.0.0 interface if otherwise unspecified)
 omnisci:info <service> [--single-info-flag]    # print the service information
 omnisci:link <service> <app> [--link-flags...] # link the omnisci service to the app
 omnisci:linked <service> <app>                 # check if the omnisci service is linked to an app
@@ -265,7 +265,7 @@ You may also run a command directly against the service. Filesystem changes will
 dokku omnisci:enter lolipop touch /tmp/test
 ```
 
-### expose a omnisci service on custom port if provided (random port otherwise)
+### expose a omnisci service on custom host:port if provided (random port on the 0.0.0.0 interface if otherwise unspecified)
 
 ```shell
 # usage
@@ -276,6 +276,12 @@ Expose the service on the service's normal ports, allowing access to it from the
 
 ```shell
 dokku omnisci:expose lolipop 6274 6278
+```
+
+Expose the service on the service's normal ports, with the first on a specified ip adddress (127.0.0.1):
+
+```shell
+dokku omnisci:expose lolipop 127.0.0.1:6274 6278
 ```
 
 ### unexpose a previously exposed omnisci service
