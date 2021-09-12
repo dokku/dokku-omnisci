@@ -19,7 +19,7 @@ service_connect() {
 
   local bin_file="/omnisci/bin/mapdql"
   docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" test -f /omnisci/bin/mapdql >/dev/null || bin_file=/omnisci/bin/omnisql
-  docker exec -i $SERVICE_TTY_OPTS "$SERVICE_NAME" "$bin_file" -p "$PASSWORD"
+  docker exec --env=LANG=C.UTF-8 --env=LC_ALL=C.UTF-8 -i $SERVICE_TTY_OPTS "$SERVICE_NAME" "$bin_file" -p "$PASSWORD"
 }
 
 service_create() {
