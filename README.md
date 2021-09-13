@@ -63,10 +63,10 @@ flags:
 - `-r|--root-password PASSWORD`: override the root-level service password
 - `-s|--shm-size SHM_SIZE`: override shared memory size for omnisci docker container
 
-Create a omnisci service named lolipop:
+Create a omnisci service named lollipop:
 
 ```shell
-dokku omnisci:create lolipop
+dokku omnisci:create lollipop
 ```
 
 You can also specify the image and image version to use for the service. It *must* be compatible with the omnisci/core-os-cpu image.
@@ -74,14 +74,14 @@ You can also specify the image and image version to use for the service. It *mus
 ```shell
 export OMNISCI_IMAGE="omnisci/core-os-cpu"
 export OMNISCI_IMAGE_VERSION="${PLUGIN_IMAGE_VERSION}"
-dokku omnisci:create lolipop
+dokku omnisci:create lollipop
 ```
 
 You can also specify custom environment variables to start the omnisci service in semi-colon separated form.
 
 ```shell
 export OMNISCI_CUSTOM_ENV="USER=alpha;HOST=beta"
-dokku omnisci:create lolipop
+dokku omnisci:create lollipop
 ```
 
 ### print the service information
@@ -107,22 +107,22 @@ flags:
 Get connection information as follows:
 
 ```shell
-dokku omnisci:info lolipop
+dokku omnisci:info lollipop
 ```
 
 You can also retrieve a specific piece of service info via flags:
 
 ```shell
-dokku omnisci:info lolipop --config-dir
-dokku omnisci:info lolipop --data-dir
-dokku omnisci:info lolipop --dsn
-dokku omnisci:info lolipop --exposed-ports
-dokku omnisci:info lolipop --id
-dokku omnisci:info lolipop --internal-ip
-dokku omnisci:info lolipop --links
-dokku omnisci:info lolipop --service-root
-dokku omnisci:info lolipop --status
-dokku omnisci:info lolipop --version
+dokku omnisci:info lollipop --config-dir
+dokku omnisci:info lollipop --data-dir
+dokku omnisci:info lollipop --dsn
+dokku omnisci:info lollipop --exposed-ports
+dokku omnisci:info lollipop --id
+dokku omnisci:info lollipop --internal-ip
+dokku omnisci:info lollipop --links
+dokku omnisci:info lollipop --service-root
+dokku omnisci:info lollipop --status
+dokku omnisci:info lollipop --version
 ```
 
 ### list all omnisci services
@@ -152,13 +152,13 @@ flags:
 You can tail logs for a particular service:
 
 ```shell
-dokku omnisci:logs lolipop
+dokku omnisci:logs lollipop
 ```
 
 By default, logs will not be tailed, but you can do this with the --tail flag:
 
 ```shell
-dokku omnisci:logs lolipop --tail
+dokku omnisci:logs lollipop --tail
 ```
 
 ### link the omnisci service to the app
@@ -178,24 +178,24 @@ A omnisci service can be linked to a container. This will use native docker link
 > NOTE: this will restart your app
 
 ```shell
-dokku omnisci:link lolipop playground
+dokku omnisci:link lollipop playground
 ```
 
 The following environment variables will be set automatically by docker (not on the app itself, so they won’t be listed when calling dokku config):
 
 ```
-DOKKU_OMNISCI_LOLIPOP_NAME=/lolipop/DATABASE
-DOKKU_OMNISCI_LOLIPOP_PORT=tcp://172.17.0.1:6274
-DOKKU_OMNISCI_LOLIPOP_PORT_6274_TCP=tcp://172.17.0.1:6274
-DOKKU_OMNISCI_LOLIPOP_PORT_6274_TCP_PROTO=tcp
-DOKKU_OMNISCI_LOLIPOP_PORT_6274_TCP_PORT=6274
-DOKKU_OMNISCI_LOLIPOP_PORT_6274_TCP_ADDR=172.17.0.1
+DOKKU_OMNISCI_LOLLIPOP_NAME=/lollipop/DATABASE
+DOKKU_OMNISCI_LOLLIPOP_PORT=tcp://172.17.0.1:6274
+DOKKU_OMNISCI_LOLLIPOP_PORT_6274_TCP=tcp://172.17.0.1:6274
+DOKKU_OMNISCI_LOLLIPOP_PORT_6274_TCP_PROTO=tcp
+DOKKU_OMNISCI_LOLLIPOP_PORT_6274_TCP_PORT=6274
+DOKKU_OMNISCI_LOLLIPOP_PORT_6274_TCP_ADDR=172.17.0.1
 ```
 
 The following will be set on the linked application by default:
 
 ```
-OMNISCI_URL=omnisci://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
+OMNISCI_URL=omnisci://lollipop:SOME_PASSWORD@dokku-omnisci-lollipop:6274/lollipop
 ```
 
 The host exposed here only works internally in docker containers. If you want your container to be reachable from outside, you should use the `expose` subcommand. Another service can be linked to your app:
@@ -208,13 +208,13 @@ It is possible to change the protocol for `OMNISCI_URL` by setting the environme
 
 ```shell
 dokku config:set playground OMNISCI_DATABASE_SCHEME=omnisci2
-dokku omnisci:link lolipop playground
+dokku omnisci:link lollipop playground
 ```
 
 This will cause `OMNISCI_URL` to be set as:
 
 ```
-omnisci2://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
+omnisci2://lollipop:SOME_PASSWORD@dokku-omnisci-lollipop:6274/lollipop
 ```
 
 ### unlink the omnisci service from the app
@@ -229,7 +229,7 @@ You can unlink a omnisci service:
 > NOTE: this will restart your app and unset related environment variables
 
 ```shell
-dokku omnisci:unlink lolipop playground
+dokku omnisci:unlink lollipop playground
 ```
 
 ### Service Lifecycle
@@ -246,7 +246,7 @@ dokku omnisci:connect <service>
 Connect to the service via the omnisci connection tool:
 
 ```shell
-dokku omnisci:connect lolipop
+dokku omnisci:connect lollipop
 ```
 
 ### enter or run a command in a running omnisci service container
@@ -259,13 +259,13 @@ dokku omnisci:enter <service>
 A bash prompt can be opened against a running service. Filesystem changes will not be saved to disk.
 
 ```shell
-dokku omnisci:enter lolipop
+dokku omnisci:enter lollipop
 ```
 
 You may also run a command directly against the service. Filesystem changes will not be saved to disk.
 
 ```shell
-dokku omnisci:enter lolipop touch /tmp/test
+dokku omnisci:enter lollipop touch /tmp/test
 ```
 
 ### expose a omnisci service on custom host:port if provided (random port on the 0.0.0.0 interface if otherwise unspecified)
@@ -278,13 +278,13 @@ dokku omnisci:expose <service> <ports...>
 Expose the service on the service's normal ports, allowing access to it from the public interface (`0.0.0.0`):
 
 ```shell
-dokku omnisci:expose lolipop 6274 6278
+dokku omnisci:expose lollipop 6274 6278
 ```
 
 Expose the service on the service's normal ports, with the first on a specified ip adddress (127.0.0.1):
 
 ```shell
-dokku omnisci:expose lolipop 127.0.0.1:6274 6278
+dokku omnisci:expose lollipop 127.0.0.1:6274 6278
 ```
 
 ### unexpose a previously exposed omnisci service
@@ -297,7 +297,7 @@ dokku omnisci:unexpose <service>
 Unexpose the service, removing access to it from the public interface (`0.0.0.0`):
 
 ```shell
-dokku omnisci:unexpose lolipop
+dokku omnisci:unexpose lollipop
 ```
 
 ### promote service <service> as OMNISCI_URL in <app>
@@ -326,7 +326,7 @@ This will replace `OMNISCI_URL` with the url from other_service and generate ano
 ```
 OMNISCI_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
 DOKKU_OMNISCI_BLUE_URL=omnisci://other_service:ANOTHER_PASSWORD@dokku-omnisci-other-service:6274/other_service
-DOKKU_OMNISCI_SILVER_URL=omnisci://lolipop:SOME_PASSWORD@dokku-omnisci-lolipop:6274/lolipop
+DOKKU_OMNISCI_SILVER_URL=omnisci://lollipop:SOME_PASSWORD@dokku-omnisci-lollipop:6274/lollipop
 ```
 
 ### start a previously stopped omnisci service
@@ -339,7 +339,7 @@ dokku omnisci:start <service>
 Start the service:
 
 ```shell
-dokku omnisci:start lolipop
+dokku omnisci:start lollipop
 ```
 
 ### stop a running omnisci service
@@ -352,7 +352,7 @@ dokku omnisci:stop <service>
 Stop the service and the running container:
 
 ```shell
-dokku omnisci:stop lolipop
+dokku omnisci:stop lollipop
 ```
 
 ### graceful shutdown and restart of the omnisci service container
@@ -365,7 +365,7 @@ dokku omnisci:restart <service>
 Restart the service:
 
 ```shell
-dokku omnisci:restart lolipop
+dokku omnisci:restart lollipop
 ```
 
 ### upgrade service <service> to the specified versions
@@ -387,7 +387,7 @@ flags:
 You can upgrade an existing service to a new image or image-version:
 
 ```shell
-dokku omnisci:upgrade lolipop
+dokku omnisci:upgrade lollipop
 ```
 
 ### Service Automation
@@ -414,10 +414,10 @@ dokku omnisci:app-links playground
 dokku omnisci:exists <service>
 ```
 
-Here we check if the lolipop omnisci service exists.
+Here we check if the lollipop omnisci service exists.
 
 ```shell
-dokku omnisci:exists lolipop
+dokku omnisci:exists lollipop
 ```
 
 ### check if the omnisci service is linked to an app
@@ -427,10 +427,10 @@ dokku omnisci:exists lolipop
 dokku omnisci:linked <service> <app>
 ```
 
-Here we check if the lolipop omnisci service is linked to the `playground` app.
+Here we check if the lollipop omnisci service is linked to the `playground` app.
 
 ```shell
-dokku omnisci:linked lolipop playground
+dokku omnisci:linked lollipop playground
 ```
 
 ### list all apps linked to the omnisci service
@@ -440,10 +440,10 @@ dokku omnisci:linked lolipop playground
 dokku omnisci:links <service>
 ```
 
-List all apps linked to the `lolipop` omnisci service.
+List all apps linked to the `lollipop` omnisci service.
 
 ```shell
-dokku omnisci:links lolipop
+dokku omnisci:links lollipop
 ```
 
 ### Disabling `docker pull` calls
