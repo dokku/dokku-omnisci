@@ -1,6 +1,6 @@
 # dokku omnisci [![Build Status](https://img.shields.io/github/workflow/status/dokku/dokku-omnisci/CI/master?style=flat-square "Build Status")](https://github.com/dokku/dokku-omnisci/actions/workflows/ci.yml?query=branch%3Amaster) [![IRC Network](https://img.shields.io/badge/irc-libera-blue.svg?style=flat-square "IRC Libera")](https://webchat.libera.chat/?channels=dokku)
 
-Official omnisci plugin for dokku. Currently defaults to installing [omnisci/core-os-cpu v5.7.1](https://hub.docker.com/r/omnisci/core-os-cpu/).
+Official omnisci plugin for dokku. Currently defaults to installing [omnisci/core-os-cpu v5.8.0](https://hub.docker.com/r/omnisci/core-os-cpu/).
 
 ## Requirements
 
@@ -17,26 +17,26 @@ sudo dokku plugin:install https://github.com/dokku/dokku-omnisci.git omnisci
 ## Commands
 
 ```
-omnisci:app-links <app>                        # list all omnisci service links for a given app
-omnisci:connect <service>                      # connect to the service via the omnisci connection tool
-omnisci:create <service> [--create-flags...]   # create a omnisci service
-omnisci:destroy <service> [-f|--force]         # delete the omnisci service/data/container if there are no links left
-omnisci:enter <service>                        # enter or run a command in a running omnisci service container
-omnisci:exists <service>                       # check if the omnisci service exists
-omnisci:expose <service> <ports...>            # expose a omnisci service on custom host:port if provided (random port on the 0.0.0.0 interface if otherwise unspecified)
-omnisci:info <service> [--single-info-flag]    # print the service information
-omnisci:link <service> <app> [--link-flags...] # link the omnisci service to the app
-omnisci:linked <service> <app>                 # check if the omnisci service is linked to an app
-omnisci:links <service>                        # list all apps linked to the omnisci service
-omnisci:list                                   # list all omnisci services
-omnisci:logs <service> [-t|--tail]             # print the most recent log(s) for this service
-omnisci:promote <service> <app>                # promote service <service> as OMNISCI_URL in <app>
-omnisci:restart <service>                      # graceful shutdown and restart of the omnisci service container
-omnisci:start <service>                        # start a previously stopped omnisci service
-omnisci:stop <service>                         # stop a running omnisci service
-omnisci:unexpose <service>                     # unexpose a previously exposed omnisci service
-omnisci:unlink <service> <app>                 # unlink the omnisci service from the app
-omnisci:upgrade <service> [--upgrade-flags...] # upgrade service <service> to the specified versions
+omnisci:app-links <app>                            # list all omnisci service links for a given app
+omnisci:connect <service>                          # connect to the service via the omnisci connection tool
+omnisci:create <service> [--create-flags...]       # create a omnisci service
+omnisci:destroy <service> [-f|--force]             # delete the omnisci service/data/container if there are no links left
+omnisci:enter <service>                            # enter or run a command in a running omnisci service container
+omnisci:exists <service>                           # check if the omnisci service exists
+omnisci:expose <service> <ports...>                # expose a omnisci service on custom host:port if provided (random port on the 0.0.0.0 interface if otherwise unspecified)
+omnisci:info <service> [--single-info-flag]        # print the service information
+omnisci:link <service> <app> [--link-flags...]     # link the omnisci service to the app
+omnisci:linked <service> <app>                     # check if the omnisci service is linked to an app
+omnisci:links <service>                            # list all apps linked to the omnisci service
+omnisci:list                                       # list all omnisci services
+omnisci:logs <service> [-t|--tail] <tail-num-optional> # print the most recent log(s) for this service
+omnisci:promote <service> <app>                    # promote service <service> as OMNISCI_URL in <app>
+omnisci:restart <service>                          # graceful shutdown and restart of the omnisci service container
+omnisci:start <service>                            # start a previously stopped omnisci service
+omnisci:stop <service>                             # stop a running omnisci service
+omnisci:unexpose <service>                         # unexpose a previously exposed omnisci service
+omnisci:unlink <service> <app>                     # unlink the omnisci service from the app
+omnisci:upgrade <service> [--upgrade-flags...]     # upgrade service <service> to the specified versions
 ```
 
 ## Usage
@@ -142,12 +142,12 @@ dokku omnisci:list
 
 ```shell
 # usage
-dokku omnisci:logs <service> [-t|--tail]
+dokku omnisci:logs <service> [-t|--tail] <tail-num-optional>
 ```
 
 flags:
 
-- `-t|--tail`: do not stop when end of the logs are reached and wait for additional output
+- `-t|--tail [<tail-num>]`: do not stop when end of the logs are reached and wait for additional output
 
 You can tail logs for a particular service:
 
@@ -159,6 +159,12 @@ By default, logs will not be tailed, but you can do this with the --tail flag:
 
 ```shell
 dokku omnisci:logs lollipop --tail
+```
+
+The default tail setting is to show all logs, but an initial count can also be specified:
+
+```shell
+dokku omnisci:logs lollipop --tail 5
 ```
 
 ### link the omnisci service to the app
