@@ -30,6 +30,7 @@ omnisci:linked <service> <app>                     # check if the omnisci servic
 omnisci:links <service>                            # list all apps linked to the omnisci service
 omnisci:list                                       # list all omnisci services
 omnisci:logs <service> [-t|--tail] <tail-num-optional> # print the most recent log(s) for this service
+omnisci:pause <service>                            # pause a running omnisci service
 omnisci:promote <service> <app>                    # promote service <service> as OMNISCI_URL in <app>
 omnisci:restart <service>                          # graceful shutdown and restart of the omnisci service container
 omnisci:start <service>                            # start a previously stopped omnisci service
@@ -359,10 +360,23 @@ dokku omnisci:start lollipop
 dokku omnisci:stop <service>
 ```
 
-Stop the service and the running container:
+Stop the service and removes the running container:
 
 ```shell
 dokku omnisci:stop lollipop
+```
+
+### pause a running omnisci service
+
+```shell
+# usage
+dokku omnisci:pause <service>
+```
+
+Pause the running container for the service:
+
+```shell
+dokku omnisci:pause lollipop
 ```
 
 ### graceful shutdown and restart of the omnisci service container
