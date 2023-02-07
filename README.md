@@ -33,6 +33,7 @@ omnisci:logs <service> [-t|--tail] <tail-num-optional> # print the most recent l
 omnisci:pause <service>                            # pause a running omnisci service
 omnisci:promote <service> <app>                    # promote service <service> as OMNISCI_URL in <app>
 omnisci:restart <service>                          # graceful shutdown and restart of the omnisci service container
+omnisci:set <service> <key> <value>                # set or clear a property for a service
 omnisci:start <service>                            # start a previously stopped omnisci service
 omnisci:stop <service>                             # stop a running omnisci service
 omnisci:unexpose <service>                         # unexpose a previously exposed omnisci service
@@ -237,6 +238,25 @@ You can unlink a omnisci service:
 
 ```shell
 dokku omnisci:unlink lollipop playground
+```
+
+### set or clear a property for a service
+
+```shell
+# usage
+dokku omnisci:set <service> <key> <value>
+```
+
+Set the network to attach after the service container is started:
+
+```shell
+dokku omnisci:set lollipop post-create-network custom-network
+```
+
+Unset the post-create-network value:
+
+```shell
+dokku omnisci:set lollipop post-create-network
 ```
 
 ### Service Lifecycle
