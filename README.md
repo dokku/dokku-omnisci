@@ -101,7 +101,10 @@ flags:
 - `--exposed-ports`: show service exposed ports
 - `--id`: show the service container id
 - `--internal-ip`: show the service internal ip
+- `--initial-network`: show the initial network being connected to
 - `--links`: show the service app links
+- `--post-create-network`: show the networks to attach to after service container creation
+- `--post-start-network`: show the networks to attach to after service container start
 - `--service-root`: show the service root directory
 - `--status`: show the service running status
 - `--version`: show the service image version
@@ -121,7 +124,10 @@ dokku omnisci:info lollipop --dsn
 dokku omnisci:info lollipop --exposed-ports
 dokku omnisci:info lollipop --id
 dokku omnisci:info lollipop --internal-ip
+dokku omnisci:info lollipop --initial-network
 dokku omnisci:info lollipop --links
+dokku omnisci:info lollipop --post-create-network
+dokku omnisci:info lollipop --post-start-network
 dokku omnisci:info lollipop --service-root
 dokku omnisci:info lollipop --status
 dokku omnisci:info lollipop --version
