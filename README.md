@@ -33,6 +33,7 @@ omnisci:logs <service> [-t|--tail] <tail-num-optional> # print the most recent l
 omnisci:pause <service>                            # pause a running omnisci service
 omnisci:promote <service> <app>                    # promote service <service> as OMNISCI_URL in <app>
 omnisci:restart <service>                          # graceful shutdown and restart of the omnisci service container
+omnisci:set <service> <key> <value>                # set or clear a property for a service
 omnisci:start <service>                            # start a previously stopped omnisci service
 omnisci:stop <service>                             # stop a running omnisci service
 omnisci:unexpose <service>                         # unexpose a previously exposed omnisci service
@@ -100,7 +101,10 @@ flags:
 - `--exposed-ports`: show service exposed ports
 - `--id`: show the service container id
 - `--internal-ip`: show the service internal ip
+- `--initial-network`: show the initial network being connected to
 - `--links`: show the service app links
+- `--post-create-network`: show the networks to attach to after service container creation
+- `--post-start-network`: show the networks to attach to after service container start
 - `--service-root`: show the service root directory
 - `--status`: show the service running status
 - `--version`: show the service image version
@@ -120,7 +124,10 @@ dokku omnisci:info lollipop --dsn
 dokku omnisci:info lollipop --exposed-ports
 dokku omnisci:info lollipop --id
 dokku omnisci:info lollipop --internal-ip
+dokku omnisci:info lollipop --initial-network
 dokku omnisci:info lollipop --links
+dokku omnisci:info lollipop --post-create-network
+dokku omnisci:info lollipop --post-start-network
 dokku omnisci:info lollipop --service-root
 dokku omnisci:info lollipop --status
 dokku omnisci:info lollipop --version
@@ -237,6 +244,31 @@ You can unlink a omnisci service:
 
 ```shell
 dokku omnisci:unlink lollipop playground
+```
+
+### set or clear a property for a service
+
+```shell
+# usage
+dokku omnisci:set <service> <key> <value>
+```
+
+Set the network to attach after the service container is started:
+
+```shell
+dokku omnisci:set lollipop post-create-network custom-network
+```
+
+Set multiple networks:
+
+```shell
+dokku omnisci:set lollipop post-create-network custom-network,other-network
+```
+
+Unset the post-create-network value:
+
+```shell
+dokku omnisci:set lollipop post-create-network
 ```
 
 ### Service Lifecycle
