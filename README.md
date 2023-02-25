@@ -235,12 +235,6 @@ This will cause `OMNISCI_URL` to be set as:
 omnisci2://lollipop:SOME_PASSWORD@dokku-omnisci-lollipop:6274/lollipop
 ```
 
-If you specify `OMNISCI_DATABASE_SCHEME` to equal `http`, we`ll also automatically adjust `OMNISCI_URL` to match the http interface:
-
-```
-http://lollipop:SOME_PASSWORD@dokku-omnisci-lollipop:${PLUGIN_DATASTORE_PORTS[1]}
-```
-
 ### unlink the omnisci service from the app
 
 ```shell
