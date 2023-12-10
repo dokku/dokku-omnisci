@@ -74,7 +74,7 @@ Create a omnisci service named lollipop:
 dokku omnisci:create lollipop
 ```
 
-You can also specify the image and image version to use for the service. It _must_ be compatible with the omnisci/core-os-cpu image.
+You can also specify the image and image version to use for the service. It *must* be compatible with the omnisci/core-os-cpu image.
 
 ```shell
 export OMNISCI_IMAGE="omnisci/core-os-cpu"
