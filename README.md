@@ -18,6 +18,8 @@ sudo dokku plugin:install https://github.com/dokku/dokku-omnisci.git omnisci
 
 ```
 omnisci:app-links <app>                            # list all omnisci service links for a given app
+omnisci:backup-set-public-key-encryption <service> <public-key-id> # set GPG Public Key encryption for all future backups of omnisci service
+omnisci:backup-unset-public-key-encryption <service> # unset GPG Public Key encryption for future backups of the omnisci service
 omnisci:connect <service>                          # connect to the service via the omnisci connection tool
 omnisci:create <service> [--create-flags...]       # create a omnisci service
 omnisci:destroy <service> [-f|--force]             # delete the omnisci service/data/container if there are no links left
@@ -511,6 +513,39 @@ List all apps linked to the `lollipop` omnisci service.
 
 ```shell
 dokku omnisci:links lollipop
+```
+### Backups
+
+Datastore backups are supported via AWS S3 and S3 compatible services like [minio](https://github.com/minio/minio).
+
+You may skip the `backup-auth` step if your dokku install is running within EC2 and has access to the bucket via an IAM profile. In that case, use the `--use-iam` option with the `backup` command.
+
+Backups can be performed using the backup commands:
+
+### set GPG Public Key encryption for all future backups of omnisci service
+
+```shell
+# usage
+dokku omnisci:backup-set-public-key-encryption <service> <public-key-id>
+```
+
+Set the `GPG` Public Key for encrypting backups:
+
+```shell
+dokku omnisci:backup-set-public-key-encryption lollipop
+```
+
+### unset GPG Public Key encryption for future backups of the omnisci service
+
+```shell
+# usage
+dokku omnisci:backup-unset-public-key-encryption <service>
+```
+
+Unset the `GPG` Public Key encryption for backups:
+
+```shell
+dokku omnisci:backup-unset-public-key-encryption lollipop
 ```
 
 ### Disabling `docker image pull` calls
