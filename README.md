@@ -11,7 +11,7 @@ Official omnisci plugin for dokku. Currently defaults to installing [omnisci/cor
 
 ```shell
 # on 0.19.x+
-sudo dokku plugin:install https://github.com/dokku/dokku-omnisci.git omnisci
+sudo dokku plugin:install https://github.com/dokku/dokku-omnisci.git --name omnisci
 ```
 
 ## Commands
