@@ -334,7 +334,7 @@ Expose the service on the service's normal ports, allowing access to it from the
 dokku omnisci:expose lollipop 6274 6278
 ```
 
-Expose the service on the service's normal ports, with the first on a specified ip adddress (127.0.0.1):
+Expose the service on the service's normal ports, with the first on a specified ip address (127.0.0.1):
 
 ```shell
 dokku omnisci:expose lollipop 127.0.0.1:6274 6278
