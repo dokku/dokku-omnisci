@@ -514,7 +514,6 @@ List all apps linked to the `lollipop` omnisci service.
 ```shell
 dokku omnisci:links lollipop
 ```
-
 ### Backups
 
 Datastore backups are supported via AWS S3 and S3 compatible services like [minio](https://github.com/minio/minio).
