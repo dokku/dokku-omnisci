@@ -1,0 +1,70 @@
+---
+services:
+  omnisci:
+    image: "{{ .Image }}:{{ .ImageVersion }}"
+
+    volumes:
+      - type: bind
+        source: "{{ .HostRoot }}/data"
+        target: /omnisci-storage
+
+    ports:
+      # the port a client connects on, which is what a linked app is handed
+      - name: native
+        target: 6274
+        primary: true
+
+      # the http interface, which serves the same database over a different
+      # protocol
+      - name: http
+        target: 6278
+
+x-dokku:
+  plugin: omnisci
+  title: OmniSci
+  scheme: omnisci
+  alias: OMNISCI
+
+  # the account the post-create step makes, rather than the service's own name.
+  # The bash plugin puts the service name here while creating an account called
+  # omnisci, so its url names a user that was never made.
+  dsn: "{{ .Scheme }}://omnisci:{{ .Secret.password }}@{{ .Host }}:{{ .Port.native }}/{{ .Database }}"
+
+  wait: native
+
+  secrets:
+    password:
+      file: PASSWORD
+      length: 8
+      env: SERVICE_PASSWORD
+
+    # the administrative account. The bash plugin writes the image's own
+    # default here and then sets the password to what it just read, so every
+    # service it creates keeps the password that ships with the image and is
+    # the same in every installation. Generating one makes the password it
+    # already meant to set an actual one, and is what --root-password sets.
+    root_password:
+      file: ROOTPASSWORD
+      length: 16
+      env: SERVICE_ROOT_PASSWORD
+
+  hooks:
+    post_create:
+      # inside the service once it is answering: the account and the database
+      # are made by talking to the server, so there has to be a server
+      exec: ["dokku-omnisci-setup"]
+      env:
+        OMNISCI_DATABASE: "{{ .Database }}"
+        OMNISCI_PASSWORD: "{{ .Secret.password }}"
+        OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
+
+  commands:
+    connect:
+      exec: ["dokku-omnisci-sql", "-p", "{{ .Secret.password }}"]
+      env:
+        LANG: C.UTF-8
+        LC_ALL: C.UTF-8
+
+  # no export or import: the client writes its results for a person to read
+  # rather than as something to load back, and the image ships no dump tool.
+  # Clone and the backup family fall out of that.
