@@ -62,7 +62,7 @@ teardown() {
   echo "status: $status"
   url=$(dokku config:get my-app OMNISCI_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/ls/PASSWORD")"
-  assert_contains "$url" "omnisci://ls:$password@dokku-omnisci-ls:6274/ls"
+  assert_contains "$url" "omnisci://omnisci:$password@dokku-omnisci-ls:6274/ls"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
 }
@@ -95,7 +95,7 @@ teardown() {
   dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app
   url=$(dokku config:get my-app OMNISCI_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/ls/PASSWORD")"
-  assert_contains "$url" "omnisci2://ls:$password@dokku-omnisci-ls:6274/ls"
+  assert_contains "$url" "omnisci2://omnisci:$password@dokku-omnisci-ls:6274/ls"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
 }
@@ -112,7 +112,7 @@ teardown() {
   dokku "$PLUGIN_COMMAND_PREFIX:link" ls my-app --alias "ALIAS"
   url=$(dokku config:get my-app ALIAS_URL)
   password="$(sudo cat "$PLUGIN_DATA_ROOT/ls/PASSWORD")"
-  assert_contains "$url" "omnisci://ls:$password@dokku-omnisci-ls:6274/ls"
+  assert_contains "$url" "omnisci://omnisci:$password@dokku-omnisci-ls:6274/ls"
   assert_success
   dokku "$PLUGIN_COMMAND_PREFIX:unlink" ls my-app
 }
