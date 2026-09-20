@@ -1,0 +1,12 @@
+#!/bin/sh
+# Runs the client the image ships.
+#
+# The client was renamed from mapdql to omnisql, and a service may be pinned to
+# an image version older than the one this definition names, so which of the
+# two exists is a question about the image rather than about the version.
+set -e
+
+client=/omnisci/bin/omnisql
+[ -x "$client" ] || client=/omnisci/bin/mapdql
+
+exec "$client" "$@"

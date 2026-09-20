@@ -1,0 +1,33 @@
+#!/bin/sh
+# Makes the account and the database a linked app connects with.
+#
+# The image starts with one administrative account whose password is the same
+# in every installation of it, so the first thing done here is to change it.
+# Everything after that authenticates with the new one.
+set -e
+
+# the password the image ships with, which is public and the same everywhere
+DEFAULT_PASSWORD="HyperInteractive"
+
+# a password reaches sql as a string, so a quote in one would end that string
+# early. The service's own password is generated, but an operator can supply
+# their own, and that one can contain anything.
+quote() {
+  printf '%s' "$1" | sed "s/'/''/g"
+}
+
+root="$(quote "$OMNISCI_ROOT_PASSWORD")"
+password="$(quote "$OMNISCI_PASSWORD")"
+database="$(quote "$OMNISCI_DATABASE")"
+
+echo "ALTER USER admin (password = '$root');" |
+  dokku-omnisci-sql -p "$DEFAULT_PASSWORD" >/dev/null
+
+echo "CREATE USER omnisci (password = '$password', is_super = 'true');" |
+  dokku-omnisci-sql -p "$OMNISCI_ROOT_PASSWORD" >/dev/null
+
+echo "CREATE DATABASE IF NOT EXISTS $OMNISCI_DATABASE (owner = 'omnisci');" |
+  dokku-omnisci-sql -p "$OMNISCI_ROOT_PASSWORD" >/dev/null
+
+echo "ALTER USER omnisci (default_db='$database');" |
+  dokku-omnisci-sql -p "$OMNISCI_ROOT_PASSWORD" >/dev/null

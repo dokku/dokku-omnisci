@@ -6,7 +6,7 @@ setup() {
 }
 
 teardown() {
-  dokku --force "$PLUGIN_COMMAND_PREFIX:destroy" l
+  dokku "$PLUGIN_COMMAND_PREFIX:destroy" l -f
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) error when there are no arguments" {
@@ -22,21 +22,21 @@ teardown() {
 @test "($PLUGIN_COMMAND_PREFIX:info) success" {
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_contains "${lines[*]}" "omnisci://l:$password@dokku-omnisci-l:6274/l"
+  assert_contains "${lines[*]}" "omnisci://omnisci:$password@dokku-omnisci-l:6274/l"
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) replaces underscores by dash in hostname" {
   dokku "$PLUGIN_COMMAND_PREFIX:create" test_with_underscores
   run dokku "$PLUGIN_COMMAND_PREFIX:info" test_with_underscores
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/test_with_underscores/PASSWORD")"
-  assert_contains "${lines[*]}" "omnisci://test_with_underscores:$password@dokku-omnisci-test-with-underscores:6274/test_with_underscores"
-  dokku --force "$PLUGIN_COMMAND_PREFIX:destroy" test_with_underscores
+  assert_contains "${lines[*]}" "omnisci://omnisci:$password@dokku-omnisci-test-with-underscores:6274/test_with_underscores"
+  dokku "$PLUGIN_COMMAND_PREFIX:destroy" test_with_underscores -f
 }
 
 @test "($PLUGIN_COMMAND_PREFIX:info) success with flag" {
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --dsn
   local password="$(sudo cat "$PLUGIN_DATA_ROOT/l/PASSWORD")"
-  assert_output "omnisci://l:$password@dokku-omnisci-l:6274/l"
+  assert_output "omnisci://omnisci:$password@dokku-omnisci-l:6274/l"
 
   run dokku "$PLUGIN_COMMAND_PREFIX:info" l --config-dir
   assert_success
