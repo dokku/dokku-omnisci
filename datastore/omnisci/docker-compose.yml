@@ -59,8 +59,10 @@ x-dokku:
         OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
 
   commands:
+    # the account and database the dsn names. The client logs in as admin when
+    # no user is given, whose password is the root password rather than this one
     connect:
-      exec: ["dokku-omnisci-sql", "-p", "{{ .Secret.password }}"]
+      exec: ["dokku-omnisci-sql", "--db={{ .Database }}", "--user=omnisci", "-p", "{{ .Secret.password }}"]
       env:
         LANG: C.UTF-8
         LC_ALL: C.UTF-8
