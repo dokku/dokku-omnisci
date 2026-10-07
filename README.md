@@ -34,6 +34,7 @@ omnisci:mount [--replace] <service> <source:container-dir[:options]>... # mount 
 omnisci:pause <service>                            # pause a running OmniSci service
 omnisci:promote <service> [<app>]                  # promote service <service> as OMNISCI_URL in <app>
 omnisci:reexpose <service>                         # reexpose a OmniSci service, applying its expose settings
+omnisci:reset <service> [-f|--force]               # delete all data in the OmniSci service, keeping the service and its links
 omnisci:restart <service>                          # graceful shutdown and restart of the OmniSci service container
 omnisci:set <service> <key> <value>                # set or clear a property for a service
 omnisci:start <service>                            # start a previously stopped OmniSci service
@@ -179,10 +180,13 @@ flags:
 - `--backup-encryption-fingerprint`: show a sha256 fingerprint of the stored backup passphrase
 - `--backup-endpoint-url`: show the s3-compatible endpoint backups are shipped to
 - `--backup-keyserver`: show the keyserver backup public keys are fetched from
+- `--backup-mailto`: show who cron mails the output of scheduled backups to in place of the global MAILTO
+- `--backup-object-name`: show the name backups are uploaded under in place of the default
 - `--backup-public-key-id`: show the gpg public key id backups are encrypted with
 - `--backup-schedule`: show the cron schedule backups run on
 - `--backup-signature-version`: show the signature version backups authenticate with
 - `--backup-storage-class`: show the s3 storage class backups are uploaded with
+- `--backup-timestamp`: show whether backups are uploaded under a key ending in the time they started
 - `--backup-use-iam`: show whether scheduled backups authenticate with an instance role
 - `--config-dir`: show the service configuration directory
 - `--config-options`: show the config options the service container is run with
@@ -473,6 +477,36 @@ Go back to uploading backups with the bucket's default storage class:
 
 ```shell
 dokku omnisci:set lollipop backup-storage-class
+```
+
+Upload backups under a name of your own rather than omnisci-lollipop:
+
+```shell
+dokku omnisci:set lollipop backup-object-name db/latest
+```
+
+Upload every backup to the same key, without a timestamp, so bucket versioning and lifecycle rules can keep and rotate them:
+
+```shell
+dokku omnisci:set lollipop backup-timestamp false
+```
+
+Go back to timestamped backups:
+
+```shell
+dokku omnisci:set lollipop backup-timestamp
+```
+
+Mail the output of scheduled backups to a comma-separated list of email addresses or local users rather than to the global cron `MAILTO`. Requires a dokku version that reads json entries from the cron-entries plugin trigger, and a mail transfer agent on the host:
+
+```shell
+dokku omnisci:set lollipop backup-mailto ops@example.com,dba@example.com
+```
+
+Go back to mailing scheduled backup output to the global cron `MAILTO`:
+
+```shell
+dokku omnisci:set lollipop backup-mailto
 ```
 
 Cap the container log at a size of your own rather than the one it inherits:
@@ -906,7 +940,7 @@ flags:
 - `-P|--post-create-network <strings>`: a comma-separated list of networks to attach the service container to after service creation
 - `-S|--post-start-network <strings>`: a comma-separated list of networks to attach the service container to after service start
 - `--restart <string>`: the docker restart policy to run the service container with (default: always)
-- `-R|--restart-apps`: whether to stop and start the linked apps around the upgrade
+- `-R|--restart-apps`: whether to stop and start the linked apps around the upgrade, required for one that migrates the data
 - `-s|--shm-size <string>`: override shared memory size for the service docker container
 - `--volume <stringArray>`: a host path or docker volume to mount into the service container, as <source>:<container-dir>[:<options>], repeatable
 - `--volume-target <stringArray>`: mount one of the definition's volumes at another container path, as <volume>=<container-dir>, repeatable
@@ -999,6 +1033,33 @@ dokku omnisci:links lollipop
 ```
 
 Renaming an app moves its link onto the new name, and cloning an app links the clone as well as the original.
+
+### Data Management
+
+The underlying service data can be imported and exported with the following commands:
+
+### delete all data in the OmniSci service, keeping the service and its links
+
+```shell
+# usage
+dokku omnisci:reset <service> [-f|--force]
+```
+
+flags:
+
+- `-f|--force`: reset the service without asking for its name first
+
+Delete all data in the service, leaving it as empty as a newly created one. The service, its credentials, and the apps it is linked to are kept, so linked apps do not need to be relinked. Connections the apps hold open may be closed.
+
+```shell
+dokku omnisci:reset lollipop
+```
+
+The service name is asked for before anything is deleted, unless --force is given:
+
+```shell
+dokku omnisci:reset lollipop --force
+```
 
 ### Limiting where and to whom a service is exposed
 
