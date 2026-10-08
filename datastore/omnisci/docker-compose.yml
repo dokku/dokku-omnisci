@@ -67,6 +67,45 @@ x-dokku:
         LANG: C.UTF-8
         LC_ALL: C.UTF-8
 
+    # every view and then every table in the database is dropped, rather than
+    # the database. A service named omnisci has the server's own database as
+    # its own, and a database made again would leave the account's default_db
+    # naming one that no longer exists. The client lists tables and views apart,
+    # one name to a line, and exits non-zero on a statement that fails.
+    #
+    # the client is chosen here rather than through dokku-omnisci-sql, since a
+    # script is only mounted into a container made after it was added, and a
+    # reset runs in the container the service already has
+    reset:
+      exec:
+        - sh
+        - -c
+        - |
+          set -e
+          database="$1"
+          client=/omnisci/bin/omnisql
+          [ -x "$client" ] || client=/omnisci/bin/mapdql
+          sql() {
+            "$client" --db="$database" --user=omnisci -p "$OMNISCI_PASSWORD" -q
+          }
+          views="$(printf '\\v\n' | sql)"
+          tables="$(printf '\\t\n' | sql)"
+          statements="$(
+            printf '%s\n' "$views" | while IFS= read -r view; do
+              [ -z "$view" ] || printf 'DROP VIEW IF EXISTS %s;\n' "$view"
+            done
+            printf '%s\n' "$tables" | while IFS= read -r table; do
+              [ -z "$table" ] || printf 'DROP TABLE IF EXISTS %s;\n' "$table"
+            done
+          )"
+          if [ -n "$statements" ]; then
+            printf '%s\n' "$statements" | sql >/dev/null
+          fi
+        - dokku-omnisci-reset
+        - "{{ .Database }}"
+      env:
+        OMNISCI_PASSWORD: "{{ .Secret.password }}"
+
   # no export or import: the client writes its results for a person to read
   # rather than as something to load back, and the image ships no dump tool.
   # Clone and the backup family fall out of that.
