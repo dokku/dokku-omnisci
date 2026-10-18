@@ -38,6 +38,29 @@ x-dokku:
       length: 8
       env: SERVICE_PASSWORD
 
+      # the account is made by the post create hook, so its new password is
+      # given to it by the server, as admin. Inline rather than through
+      # dokku-omnisci-sql, since a script is only mounted into a container made
+      # after it was added. The same text as the root password's, which a test
+      # holds them to.
+      change:
+        exec:
+          - sh
+          - -c
+          - |
+            set -e
+            user="$1"
+            client=/omnisci/bin/omnisql
+            [ -x "$client" ] || client=/omnisci/bin/mapdql
+            password="$(printf '%s' "$NEW_PASSWORD" | sed "s/'/''/g")"
+            printf "ALTER USER %s (password = '%s');\n" "$user" "$password" |
+              "$client" --user=admin -p "$OMNISCI_ROOT_PASSWORD" -q >/dev/null
+          - dokku-omnisci-change-password
+          - omnisci
+        env:
+          OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
+          NEW_PASSWORD: "{{ .NewSecret }}"
+
     # the administrative account. The bash plugin writes the image's own
     # default here and then sets the password to what it just read, so every
     # service it creates keeps the password that ships with the image and is
@@ -47,6 +70,25 @@ x-dokku:
       file: ROOTPASSWORD
       length: 16
       env: SERVICE_ROOT_PASSWORD
+
+      # admin changes its own password, logged in with the one it has now
+      change:
+        exec:
+          - sh
+          - -c
+          - |
+            set -e
+            user="$1"
+            client=/omnisci/bin/omnisql
+            [ -x "$client" ] || client=/omnisci/bin/mapdql
+            password="$(printf '%s' "$NEW_PASSWORD" | sed "s/'/''/g")"
+            printf "ALTER USER %s (password = '%s');\n" "$user" "$password" |
+              "$client" --user=admin -p "$OMNISCI_ROOT_PASSWORD" -q >/dev/null
+          - dokku-omnisci-change-password
+          - admin
+        env:
+          OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
+          NEW_PASSWORD: "{{ .NewSecret }}"
 
   hooks:
     post_create:
