@@ -36,7 +36,7 @@ omnisci:promote <service> [<app>]                  # promote service <service> a
 omnisci:reexpose <service>                         # reexpose a OmniSci service, applying its expose settings
 omnisci:reset <service> [-f|--force]               # delete all data in the OmniSci service, keeping the service and its links
 omnisci:restart <service>                          # graceful shutdown and restart of the OmniSci service container
-omnisci:set <service> <key> <value>                # set or clear a property for a service
+omnisci:set <service> <key> [<value>] [--id <id>]  # set or clear a property for a service
 omnisci:start <service>                            # start a previously stopped OmniSci service
 omnisci:stop <service>                             # stop a running OmniSci service
 omnisci:unexpose <service>                         # unexpose a previously exposed OmniSci service
@@ -185,6 +185,7 @@ flags:
 - `--backup-object-name`: show the name backups are uploaded under in place of the default
 - `--backup-public-key-id`: show the gpg public key id backups are encrypted with
 - `--backup-schedule`: show the cron schedule backups run on
+- `--backup-schedules`: show every scheduled backup, as id, schedule, bucket and use-iam
 - `--backup-secret-access-key-fingerprint`: show a sha256 fingerprint of the stored backup secret access key
 - `--backup-signature-version`: show the signature version backups authenticate with
 - `--backup-storage-class`: show the s3 storage class backups are uploaded with
@@ -461,12 +462,13 @@ An app is still linked after its `OMNISCI_URL` is changed to point elsewhere, an
 
 ```shell
 # usage
-dokku omnisci:set <service> <key> <value>
+dokku omnisci:set <service> <key> [<value>] [--id <id>]
 ```
 
 flags:
 
 - `--allow-restart`: restart or reexpose the service when the property only takes effect that way and its value changed
+- `--id <string>`: record the property on this backup schedule instead of on the service
 - `--no-restart`: do not restart the linked apps when a password change updates the url they hold
 
 Set the network to attach after the service container is started:
