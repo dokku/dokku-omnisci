@@ -25,12 +25,117 @@ x-dokku:
   scheme: omnisci
   alias: OMNISCI
 
-  # the account the post-create step makes, rather than the service's own name.
-  # The bash plugin puts the service name here while creating an account called
-  # omnisci, so its url names a user that was never made.
-  dsn: "{{ .Scheme }}://omnisci:{{ .Secret.password }}@{{ .Host }}:{{ .Port.native }}/{{ .Database }}"
+  # the account the post-create step makes, rather than the service's own name,
+  # unless the link names a user made in the service. The bash plugin puts the
+  # service name here while creating an account called omnisci, so its url
+  # names a user that was never made.
+  dsn: "{{ .Scheme }}://{{ .Username }}:{{ .Password }}@{{ .Host }}:{{ .Port.native }}/{{ .Database }}"
 
   wait: native
+
+  # the databases and users a service holds beside its own, made as admin.
+  # Every user is given every privilege on each database the service holds,
+  # and on each one made later, but is not a superuser as the service's own
+  # account is. The client is chosen inline, as reset does, since a script is
+  # only mounted into a container made after it was added. Names are checked
+  # before they get here, so they are written as they are, and a password is
+  # written to the client's stdin rather than passed as an argument.
+  databases:
+    create:
+      exec:
+        - sh
+        - -c
+        - |
+          set -e
+          client=/omnisci/bin/omnisql
+          [ -x "$client" ] || client=/omnisci/bin/mapdql
+          {
+            printf "CREATE DATABASE %s (owner = 'omnisci');\n" "$1"
+            for user in $2; do
+              [ "$user" = omnisci ] || printf 'GRANT ALL ON DATABASE %s TO %s;\n' "$1" "$user"
+            done
+          } |
+            "$client" --user=admin -p "$OMNISCI_ROOT_PASSWORD" -q >/dev/null
+        - dokku-omnisci-create-database
+        - "{{ .Args.database }}"
+        - "{{ .Args.users }}"
+      env:
+        OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
+    destroy:
+      exec:
+        - sh
+        - -c
+        - |
+          set -e
+          client=/omnisci/bin/omnisql
+          [ -x "$client" ] || client=/omnisci/bin/mapdql
+          printf 'DROP DATABASE %s;\n' "$1" |
+            "$client" --user=admin -p "$OMNISCI_ROOT_PASSWORD" -q >/dev/null
+        - dokku-omnisci-destroy-database
+        - "{{ .Args.database }}"
+      env:
+        OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
+
+  users:
+    default: omnisci
+    secret: password
+    reserved: [admin]
+    create:
+      exec:
+        - sh
+        - -c
+        - |
+          set -e
+          client=/omnisci/bin/omnisql
+          [ -x "$client" ] || client=/omnisci/bin/mapdql
+          password="$(printf '%s' "$NEW_PASSWORD" | sed "s/'/''/g")"
+          {
+            printf "CREATE USER %s (password = '%s', is_super = 'false');\n" "$1" "$password"
+            for database in $2; do
+              printf 'GRANT ALL ON DATABASE %s TO %s;\n' "$database" "$1"
+            done
+          } |
+            "$client" --user=admin -p "$OMNISCI_ROOT_PASSWORD" -q >/dev/null
+        - dokku-omnisci-create-user
+        - "{{ .Args.user }}"
+        - "{{ .Args.databases }}"
+      env:
+        OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
+        NEW_PASSWORD: "{{ .NewSecret }}"
+    destroy:
+      exec:
+        - sh
+        - -c
+        - |
+          set -e
+          client=/omnisci/bin/omnisql
+          [ -x "$client" ] || client=/omnisci/bin/mapdql
+          printf 'DROP USER %s;\n' "$1" |
+            "$client" --user=admin -p "$OMNISCI_ROOT_PASSWORD" -q >/dev/null
+        - dokku-omnisci-destroy-user
+        - "{{ .Args.user }}"
+      env:
+        OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
+
+    # the same text as the passwords' own changes, given the user to change
+    change:
+      exec:
+        - sh
+        - -c
+        - |
+          set -e
+          user="$1"
+          client=/omnisci/bin/omnisql
+          [ -x "$client" ] || client=/omnisci/bin/mapdql
+          password="$(printf '%s' "$NEW_PASSWORD" | sed "s/'/''/g")"
+          printf "ALTER USER %s (password = '%s');\n" "$user" "$password" |
+            "$client" --user=admin -p "$OMNISCI_ROOT_PASSWORD" -q >/dev/null
+        - dokku-omnisci-change-password
+        - "{{ .Args.user }}"
+      env:
+        OMNISCI_ROOT_PASSWORD: "{{ .Secret.root_password }}"
+        NEW_PASSWORD: "{{ .NewSecret }}"
+
 
   secrets:
     password:
@@ -104,7 +209,7 @@ x-dokku:
     # the account and database the dsn names. The client logs in as admin when
     # no user is given, whose password is the root password rather than this one
     connect:
-      exec: ["dokku-omnisci-sql", "--db={{ .Database }}", "--user=omnisci", "-p", "{{ .Secret.password }}"]
+      exec: ["dokku-omnisci-sql", "--db={{ .Database }}", "--user={{ .Username }}", "-p", "{{ .Password }}"]
       env:
         LANG: C.UTF-8
         LC_ALL: C.UTF-8
