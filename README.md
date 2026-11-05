@@ -31,6 +31,7 @@ omnisci:expose <service> <ports...>                # expose a OmniSci service on
 omnisci:info [<service>] [--info-flags...]         # print the service information
 omnisci:label <service> <key=value>...             # add docker labels to the service container
 omnisci:link <service> [<app>] [--link-flags...]   # link the OmniSci service to the app
+omnisci:link-migrate <service> [<app>]             # move apps linked to the OmniSci service off the deprecated docker link and onto a network
 omnisci:linked <service> [<app>]                   # check if the OmniSci service is linked to an app
 omnisci:links <service>                            # list all apps linked to the OmniSci service
 omnisci:list                                       # list all OmniSci services
@@ -185,6 +186,7 @@ flags:
 
 - `--backend`: show the execution backend the service was created with
 - `--backup-access-key-id-fingerprint`: show a sha256 fingerprint of the stored backup access key id
+- `--backup-all-databases`: show whether backups hold every database in the service rather than only the one named for it
 - `--backup-auth-fingerprint`: show a sha256 fingerprint of the stored backup access key id and secret
 - `--backup-authenticated`: show whether backup credentials are stored for the service
 - `--backup-bucket`: show the bucket scheduled backups are shipped to
@@ -391,9 +393,9 @@ The following will be set on the linked application by default:
 OMNISCI_URL=omnisci://:SOME_PASSWORD@dokku-omnisci-lollipop:6274
 ```
 
-The host exposed here only works internally in docker containers. If you want your container to be reachable from outside, you should use the `expose` subcommand. Earlier versions of the plugin linked an app with a docker link, which docker has deprecated, and which set `DOKKU_OMNISCI_LOLLIPOP_PORT` style variables on the app's containers. Docker 29 no longer sets them, so an app reading them should read `OMNISCI_URL` instead. Updating the plugin moves every linked app onto the network for its link, and the docker link is gone from each app's containers once they are restarted.
+The host exposed here only works internally in docker containers. If you want your container to be reachable from outside, you should use the `expose` subcommand. Earlier versions of the plugin linked an app with a docker link, which docker has deprecated, and which set `DOKKU_OMNISCI_LOLLIPOP_PORT` style variables on the app's containers. Docker 29 no longer sets them, so an app reading them should read `OMNISCI_URL` instead. An app linked that way keeps its docker link, and updating the plugin warns about it, until it is moved onto a network with omnisci:link-migrate.
 
-> NOTE: every link uses a docker network of its own. docker's default address pools hold about 31 networks, so a server with many links may need a larger default-address-pools setting in /etc/docker/daemon.json.
+> NOTE: every link uses a docker network of its own. docker's default address pools hold about 31 networks, so a server with many links may need a larger default-address-pools setting in /etc/docker/daemon.json, which only applies once docker is restarted. A link that cannot get a network fails and says what to change, and nothing is set on the app.
 
 Another service can be linked to your app:
 
@@ -464,6 +466,29 @@ dokku omnisci:link lollipop playground --user painter
 
 The database and user a link was made on are recorded, so unlink, promote and a password change find the url they gave the app. An app that is already linked has to be unlinked and linked again to move it to another database or user.
 
+### move apps linked to the OmniSci service off the deprecated docker link and onto a network
+
+```shell
+# usage
+dokku omnisci:link-migrate <service> [<app>]
+```
+
+Earlier versions of the plugin, and the bash plugins before them, linked an app with a docker link, which docker 30.0 removes. Such a link keeps working until it is moved, and updating the plugin and deploying the app warn about it. Move every app linked to the lollipop omnisci service onto the network of its link:
+
+```shell
+dokku omnisci:link-migrate lollipop
+```
+
+Move only the `playground` app:
+
+```shell
+dokku omnisci:link-migrate lollipop playground
+```
+
+The network is made and the app's running containers join it before the docker link is removed, so nothing is restarted, and the app's config is not changed, since the service answers to the same host on the network. An app that cannot be moved keeps its docker link, the error says why, and the other apps are still moved. An app that was already moved is put back on its network, which repairs a network that went missing.
+
+> NOTE: every link uses a docker network of its own. a host that runs out of docker's address pools is told the default-address-pools setting to add to /etc/docker/daemon.json. it only applies once docker is restarted, as a reload does not apply it, and then the command can be run again.
+
 ### unlink the OmniSci service from the app
 
 ```shell
@@ -495,6 +520,7 @@ dokku omnisci:set <service> <key> [<value>] [--id <id>]
 flags:
 
 - `--allow-restart`: restart or reexpose the service when the property only takes effect that way and its value changed
+- `--ambassador-image <string>`: the image to make the ambassador from, with a tag or digest, overriding PLUGIN_AMBASSADOR_IMAGE and the ambassador-image global property
 - `--global`: set the property for every service of the datastore, taking <datastore-type> <key> [<value>] with no service name
 - `--id <string>`: record the property on this backup schedule instead of on the service
 - `--no-restart`: do not restart the linked apps when a password change updates the url they hold
@@ -870,6 +896,7 @@ dokku omnisci:expose <service> <ports...>
 
 flags:
 
+- `--ambassador-image <string>`: the image to make the ambassador from, with a tag or digest, overriding PLUGIN_AMBASSADOR_IMAGE and the ambassador-image global property
 - `-f|--force`: stop and start a running service without asking when its container has to publish other ports
 
 Expose the service on the service's normal ports, allowing access to it from the public interface (`0.0.0.0`):
@@ -897,6 +924,12 @@ Expose the service by publishing its ports on the service container itself rathe
 ```shell
 dokku omnisci:set lollipop expose-mode direct
 dokku omnisci:expose lollipop --force
+```
+
+Expose the service through an ambassador made from another image:
+
+```shell
+dokku omnisci:expose lollipop --ambassador-image dokku/ambassador:0.8.4
 ```
 
 Print the dsn a client off the host connects with, which names the expose-host or the first global domain:
@@ -937,6 +970,7 @@ dokku omnisci:reexpose <service>
 
 flags:
 
+- `--ambassador-image <string>`: the image to make the ambassador from, with a tag or digest, overriding PLUGIN_AMBASSADOR_IMAGE and the ambassador-image global property
 - `-f|--force`: stop and start a running service without asking when its container has to publish other ports
 
 Apply a changed port-bind-address or port-source-range to an exposed service, on the ports it is already exposed on:
@@ -951,6 +985,13 @@ Move an exposed service between being published through an ambassador and direct
 ```shell
 dokku omnisci:set lollipop expose-mode direct
 dokku omnisci:reexpose lollipop --force
+```
+
+Replace the ambassador with one made from another image. --ambassador-image wins over `PLUGIN_AMBASSADOR_IMAGE,` which wins over the ambassador-image global property:
+
+```shell
+dokku omnisci:reexpose lollipop --ambassador-image dokku/ambassador:0.8.4
+dokku omnisci:set --global ambassador-image dokku/ambassador:0.8.4
 ```
 
 > NOTE: a service published through an ambassador only has the ambassador replaced, so the service keeps running, though connections made through the exposed ports are dropped. An ambassador that already matches the service's settings and is publishing is left alone.
@@ -993,6 +1034,10 @@ DOKKU_OMNISCI_BLACK_URL=omnisci://:SOME_PASSWORD@dokku-omnisci-lollipop:6274/lol
 dokku omnisci:start <service>
 ```
 
+flags:
+
+- `--ambassador-image <string>`: the image to make the ambassador from, with a tag or digest, overriding PLUGIN_AMBASSADOR_IMAGE and the ambassador-image global property
+
 Start the service:
 
 ```shell
@@ -1034,6 +1079,10 @@ dokku omnisci:pause lollipop
 dokku omnisci:restart <service>
 ```
 
+flags:
+
+- `--ambassador-image <string>`: the image to make the ambassador from, with a tag or digest, overriding PLUGIN_AMBASSADOR_IMAGE and the ambassador-image global property
+
 Restart the service:
 
 ```shell
@@ -1049,6 +1098,7 @@ dokku omnisci:upgrade <service> [--upgrade-flags...]
 
 flags:
 
+- `--ambassador-image <string>`: the image to make the ambassador from, with a tag or digest, overriding PLUGIN_AMBASSADOR_IMAGE and the ambassador-image global property
 - `-c|--config-options <string>`: extra arguments for the process the service container runs, not docker flags; use mount for mounts
 - `-C|--custom-env <string>`: semi-colon delimited environment variables to start the service with
 - `--definition <string>`: the definition to move the service onto, instead of the one its image and version resolve to
@@ -1361,6 +1411,12 @@ An exposed service's ports are published by an ambassador, a container that rela
 To publish the ports on the service container itself instead, set the service's `expose-mode` property to `direct` with `dokku omnisci:set`. Docker has no way of changing the ports a container publishes, so the container is made again whenever what it publishes changes: when the service is exposed or unexposed, when its `port-bind-address` changes, and when it moves between expose modes. For a running service, `dokku omnisci:expose`, `dokku omnisci:unexpose` and `dokku omnisci:reexpose` ask before stopping and starting it, and change nothing if the answer is no. Pass `--force` to stop and start it without being asked. A change also reaches the service the next time it is restarted, or stopped and started.
 
 A `port-source-range` cannot be enforced on a port the service container publishes itself, so it cannot be set on a service exposed directly, and a service with one cannot be exposed directly.
+
+### Choosing the ambassador image
+
+The ambassador is made from `dokku/ambassador:0.8.4` unless another image is named. Pass `--ambassador-image` to `expose`, `reexpose`, `start`, `restart`, `upgrade` or `set` to name one for that command, set the `PLUGIN_AMBASSADOR_IMAGE` environment variable, or set the `ambassador-image` global property with `dokku omnisci:set --global ambassador-image dokku/ambassador:0.8.4`. The flag is used first, then the environment variable, then the global property. The environment variable only reaches the plugin where sudo keeps the caller's environment, which it does not on newer versions of ubuntu.
+
+The image has to name a tag or a digest. A different image reaches an exposed service on its next start, restart, upgrade or `dokku omnisci:reexpose`, which replace an ambassador made from another image. `dokku/ambassador:0.8.4` or newer is needed for a udp port.
 
 ### Connecting to an exposed service from outside the host
 
